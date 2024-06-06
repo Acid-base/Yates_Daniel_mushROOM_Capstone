@@ -1,0 +1,5 @@
+{
+	"dependencies": {
+		"generate-react-cli": "^8.4.6"
+	}
+}

@@ -1,0 +1,107 @@
+# .gitignore
+
+# Logs and output
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store
+
+# Build artifacts 
+dist
+build
+public/build
+.next
+out
+
+# Dependency caches
+node_modules
+.cache
+.yarn-cache
+
+# IDE/Editor settings
+.idea
+.vscode
+*.swp
+*.swo
+*.DS_Store
+
+# OS-specific files
+Thumbs.db
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Other
+coverage
+.nyc_output
+.eslintcache
+.prettierrc.js # Adjust if using a different Prettier config file
+
+# Backend-specific (adjust based on your setup)
+*.sqlite3
+
+# Frontend-specific (adjust based on framework)
+.cache/ # Common for Next.js
+
+# .gitignore
+
+# General
+node_modules
+dist
+.cache
+
+# Logs and output
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE and editor settings
+.idea
+.vscode
+*.swp
+*.swo
+*.DS_Store
+
+# OS-specific files
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+dist
+build
+
+# Package manager lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Other
+coverage
+.nyc_output
+
+# Vite-specific
+vite.config.js.timestamp-cache
+
+# Backend-specific (adjust as needed)
+# If you have a backend folder, uncomment the line below
+# backend/node_modules 
+backend/renderstaywoke/
+j.json
