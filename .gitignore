@@ -105,3 +105,19 @@ vite.config.js.timestamp-cache
 # backend/node_modules 
 backend/renderstaywoke/
 j.json
+.continuerc.json
+alt.json
+backend/CSV/images(1).csv
+backend/CSV/images_observations(1).csv
+backend/CSV/location_descriptions(1).csv
+backend/CSV/locations(1).csv
+backend/CSV/name_classifications(1).csv
+backend/CSV/name_descriptions(1).csv
+backend/CSV/names(1).csv
+backend/CSV/observations(1).csv
+backend/import-csv.js
+backend/models/index.js
+backend/scripts/setup.js
+middleware/stayup.js
+middleware/proxy.js
+template.json

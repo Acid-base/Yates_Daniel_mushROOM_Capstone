@@ -3,7 +3,9 @@ import React from 'react';
 import MushroomCard from './MushroomCard';
 
 function ResultsList({ results, onMushroomSelect }) {
-  // 'results' prop will be an array of mushroom data
+  if (!results) { 
+    return <div>Loading mushrooms...</div>; 
+  }
   return (
     <ul>
       {results.map((mushroom) => (
@@ -14,4 +16,3 @@ function ResultsList({ results, onMushroomSelect }) {
 }
 
 export default ResultsList;
-
