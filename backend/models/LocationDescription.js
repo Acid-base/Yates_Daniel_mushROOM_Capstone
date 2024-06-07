@@ -1,3 +1,4 @@
+// backend/models/LocationDescription.js
 const mongoose = require('mongoose'); // Import mongoose at the top 
 
 const locationDescriptionSchema = new mongoose.Schema({
@@ -19,3 +20,7 @@ locationDescriptionSchema.index({ "gen_desc": "text", "ecology": "text", "specie
 const LocationDescription = mongoose.model('LocationDescription', locationDescriptionSchema);
 
 module.exports = LocationDescription;
+
+// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
+//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
+//  - Checked for typos in schema imports and model creation in index.js.

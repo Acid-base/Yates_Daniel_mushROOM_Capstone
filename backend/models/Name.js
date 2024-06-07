@@ -1,3 +1,4 @@
+// backend/models/Name.js
 const mongoose = require('mongoose');
 
 const nameSchema = new mongoose.Schema({
@@ -19,3 +20,7 @@ nameSchema.index({ correct_spelling_id: 1, synonym_id: 1 });
 const Name = mongoose.model('Name', nameSchema);
 
 module.exports = Name;
+
+// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
+//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
+//  - Checked for typos in schema imports and model creation in index.js.

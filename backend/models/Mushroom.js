@@ -32,3 +32,6 @@ const Mushroom = mongoose.model('Mushroom', mushroomSchema);
 
 module.exports = Mushroom;
 
+// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
+//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
+//  - Checked for typos in schema imports and model creation in index.js.

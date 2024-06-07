@@ -1,3 +1,4 @@
+// backend/models/Image.js
 const mongoose = require('mongoose'); // Import mongoose at the top 
 
 const imageSchema = new mongoose.Schema({
@@ -19,3 +20,10 @@ imageSchema.index({ copyright_holder: 1 });
 const Image = mongoose.model('Image', imageSchema);
 
 module.exports = Image;
+
+// Blocker:  The error "The 2nd parameter to mongoose.model() should be a schema or a POJO"
+//    - Tried multiple ways to create models: 
+//      - Explicitly outside module.exports.
+//      - Within the module.exports block.
+//    - Tried with and without importing mongoose in each model file.
+//    - Checked for typos in schema imports and model creation in index.js

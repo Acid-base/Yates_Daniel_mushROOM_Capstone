@@ -1,3 +1,4 @@
+// backend/models/NameClassification.js
 const mongoose = require('mongoose');
 
 const nameClassificationSchema = new mongoose.Schema({
@@ -15,3 +16,7 @@ nameClassificationSchema.index({ name_id: 1 }, { unique: true }); // Ensure one-
 const NameClassification = mongoose.model('NameClassification', nameClassificationSchema);
 
 module.exports = NameClassification;
+
+// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
+//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
+//  - Checked for typos in schema imports and model creation in index.js.

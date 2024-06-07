@@ -28,3 +28,7 @@ locationSchema.index({ "area": "2dsphere" }); // GeoSpatial index
 const Location = mongoose.model('Location', locationSchema);
 
 module.exports = Location;
+
+// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
+//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
+//  - Checked for typos in schema imports and model creation in index.js.

@@ -1,3 +1,4 @@
+// backend/models/NameDescription.js
 const mongoose = require('mongoose');
 
 const nameDescriptionSchema = new mongoose.Schema({
@@ -22,3 +23,7 @@ nameDescriptionSchema.index({ "general_description": "text", "diagnostic_descrip
 const NameDescription = mongoose.model('NameDescription', nameDescriptionSchema);
 
 module.exports = NameDescription;
+
+// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
+//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
+//  - Checked for typos in schema imports and model creation in index.js.
