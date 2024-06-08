@@ -76,8 +76,7 @@ async function updateDatabase() {
 }
 // Connect to your MongoDB database 
 mongoose.connect('mongodb://localhost:27017/mushroom_app', { 
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+   
 })
 .then(() => {
     console.log('Connected to MongoDB');
@@ -91,3 +90,4 @@ mongoose.connect('mongodb://localhost:27017/mushroom_app', {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz

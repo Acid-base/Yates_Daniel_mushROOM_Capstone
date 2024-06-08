@@ -121,3 +121,5 @@ backend/scripts/setup.js
 middleware/stayup.js
 middleware/proxy.js
 template.json
+backend/scripts/localdatasetup.js
+backend/scripts/localsave.js

@@ -1,34 +1,29 @@
 // backend/models/Location.js
-const mongoose = require('mongoose'); // Import mongoose at the top 
+const mongoose = require('mongoose'); 
+
 const locationSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
+  // id: { type: Number, required: true, unique: true }, // Removed: MongoDB can auto-generate _id
   name: { type: String, required: true },
-  // Use GeoJSON Polygon for area definition
   area: {
     type: {
       type: String,
-      enum: ['Polygon'],
+      enum: ['Polygon'], // Only Polygons for now, consider adding more later if needed
       required: true
     },
     coordinates: {
-      type: [[[Number]]],
+      type: [[[Number]]], // Array of polygons (for complex shapes)
       required: true
     }
   },
-  high: { type: Number },
-  low: { type: Number },
-  observations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Observation' }],
-  descriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LocationDescription' }],
+  high: { type: Number }, 
+  low: { type: Number } 
 });
 
 // Create indexes for efficient querying
-locationSchema.index({ id: 1 });
-locationSchema.index({ "area": "2dsphere" }); // GeoSpatial index
+locationSchema.index({ name: 1 }); // Index for searching by name
+locationSchema.index({ "area": "2dsphere" }); // Geospatial index
 
 const Location = mongoose.model('Location', locationSchema);
 
 module.exports = Location;
 
-// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
-//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
-//  - Checked for typos in schema imports and model creation in index.js.

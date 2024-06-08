@@ -1,22 +1,19 @@
 // backend/models/NameClassification.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
+const Schema = mongoose.Schema;
 
 const nameClassificationSchema = new mongoose.Schema({
-  name_id: { type: Number, required: true, ref: 'Name' },
+  name: { type: Schema.Types.ObjectId, ref: 'Name', required: true, unique: true }, 
   domain: { type: String, required: true },
   kingdom: { type: String, required: true },
   phylum: { type: String, required: true },
   class: { type: String, required: true },
   order: { type: String, required: true },
-  family: { type: String, required: true }
+  family: { type: String, required: true } 
 });
 
-nameClassificationSchema.index({ name_id: 1 }, { unique: true }); // Ensure one-to-one relationship
+//  nameClassificationSchema.index({ name: 1 }, { unique: true }); //No longer needed, unique is declared above
 
 const NameClassification = mongoose.model('NameClassification', nameClassificationSchema);
 
 module.exports = NameClassification;
-
-// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
-//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
-//  - Checked for typos in schema imports and model creation in index.js.

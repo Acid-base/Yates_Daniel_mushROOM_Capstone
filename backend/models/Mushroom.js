@@ -1,37 +1,22 @@
-// backend/models/Mushroom.js
-const mongoose = require('mongoose');
-
-const mushroomSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true }, // Assuming your CSV has an ID column
-  name: { type: String, required: true },
-  scientific_name: { type: String, required: true },
-  when: { type: Date }, // Date of observation
-  lat: { type: Number },
-  lng: { type: Number },
-  where: { type: String },
-  user_id: { type: Number }, // ID of the user who made the observation
-  thumb_image_id: { type: Number, ref: 'Image' },  // ID of the thumbnail image 
-  // Fields from the MushroomObserver database schema
-  family: { type: String },
-  genus: { type: String },
-  type: {
-    type: String,
-    enum: ['Edible', 'Poisonous', 'Unknown'],
-    default: 'Unknown'
-  },
-  // Additional fields based on your needs
-  observations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Observation' }], // Reference to Observation
-  descriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'NameDescription' }], // Reference to NameDescription
-  classifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'NameClassification' }], // Reference to NameClassification 
+// backend/models/Name.js
+const mongoose = require('mongoose'); 
+const nameSchema = new mongoose.Schema({
+  // id: { type: Number, required: true, unique: true },  // Removed: MongoDB will handle this
+  text_name: { type: String, required: true },
+  author: { type: String, required: true },
+  deprecated: { type: Boolean, required: true },
+  correct_spelling_id: { type: Number }, 
+  synonym_id: { type: Number }, 
+  rank: { type: Number, required: true } 
 });
 
-// Create an index for searching by name 
-mushroomSchema.index({ name: "text", scientific_name: "text" }); 
+// Create indexes *on the schema* 
+nameSchema.index({ text_name: 1 }); // Index for the text_name field
+nameSchema.index({ correct_spelling_id: 1, synonym_id: 1 }); 
 
-const Mushroom = mongoose.model('Mushroom', mushroomSchema);
+// Only define the model if it hasn't been defined yet
+if (!mongoose.models.Name) { 
+    mongoose.model('Name', nameSchema); 
+}
 
-module.exports = Mushroom;
-
-// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
-//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
-//  - Checked for typos in schema imports and model creation in index.js.
+// ... rest of your code (if any)

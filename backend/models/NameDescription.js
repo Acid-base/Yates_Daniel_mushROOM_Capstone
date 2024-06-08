@@ -1,9 +1,10 @@
 // backend/models/NameDescription.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
+const Schema = mongoose.Schema; 
 
-const nameDescriptionSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
-  name_id: { type: Number, required: true, ref: 'Name' },
+const nameDescriptionSchema = new Schema({
+  // id: { type: Number, required: true, unique: true }, // Removed: MongoDB will create this
+  name: { type: Schema.Types.ObjectId, ref: 'Name', required: true },
   source_type: { type: String, required: true },
   source_name: { type: String },
   general_description: { type: String },
@@ -14,16 +15,21 @@ const nameDescriptionSchema = new mongoose.Schema({
   uses: { type: String },
   notes: { type: String },
   refs: { type: String }
+  // id: { type: Number, required: true } // Removed - potential conflict and not needed
 });
 
-nameDescriptionSchema.index({ name_id: 1 });
+nameDescriptionSchema.index({ name: 1 });
 nameDescriptionSchema.index({ source_type: 1 });
-nameDescriptionSchema.index({ "general_description": "text", "diagnostic_description": "text", "distribution": "text", "habitat": "text", "look_alikes": "text", "uses": "text", "notes": "text", "refs": "text" }); // Text index for searching
-
+nameDescriptionSchema.index({ 
+  "general_description": "text", 
+  "diagnostic_description": "text", 
+  "distribution": "text", 
+  "habitat": "text", 
+  "look_alikes": "text", 
+  "uses": "text", 
+  "notes": "text", 
+  "refs": "text" 
+});
 const NameDescription = mongoose.model('NameDescription', nameDescriptionSchema);
 
 module.exports = NameDescription;
-
-// Blocker:  "The 2nd parameter to mongoose.model() should be a schema or a POJO" 
-//  - Error persists despite trying various solutions, including explicit creation and different import approaches.
-//  - Checked for typos in schema imports and model creation in index.js.
