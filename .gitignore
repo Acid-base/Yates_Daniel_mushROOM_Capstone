@@ -123,3 +123,15 @@ middleware/proxy.js
 template.json
 backend/scripts/localdatasetup.js
 backend/scripts/localsave.js
+backend/mongo/models/index.js
+backend/mongo/CSV/images(1).csv
+backend/mongo/CSV/images_observations(1).csv
+backend/mongo/CSV/locations(1).csv
+backend/mongo/CSV/location_descriptions(1).csv
+backend/mongo/CSV/name_classifications(1).csv
+backend/mongo/CSV/names(1).csv
+backend/mongo/CSV/name_descriptions(1).csv
+backend/mongo/CSV/observations(1).csv
+backend/mongo/mockSchema.js
+backend/mongo/scripts/localsave.js
+backend/mongo/scripts/localdatasetup.js

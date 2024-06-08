@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const Mushroom = require('../models/Mushroom'); // Import the Mushroom model
+const Mushroom = require('../mongo/models/Mushroom'); // Import the Mushroom model
 console.log(__dirname)
 // GET /mushrooms - Get a list of mushrooms
 router.get('/', async (req, res) => {
