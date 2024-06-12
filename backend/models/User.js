@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profile: {
+    location: String, // Optional: user's location
+    avatarUrl: String, // Optional: URL of user's avatar
+    bio: String, // Optional: brief user bio
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

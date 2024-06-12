@@ -1,7 +1,3 @@
-// routes/mushrooms.js 
-const express = require('express');
-const router = express.Router();
-const Mushroom = require('../models/Mushroom');
 const authenticateToken = require('../middleware/auth');
 
 // GET /mushrooms - Get a list of mushrooms

@@ -34,7 +34,11 @@ const MushroomSchema = new mongoose.Schema({
   // Taxonomy 
   // Optional: Additional details 
   // Optional: Links for further information
-  additionalImages: [String], // Array to store additional image URLs 
+  // This replaces the additionalImages array with a gallery structure
+  gallery: [{
+    url: String,
+    thumbnailUrl: String
+  }], 
   kingdom: String,
   phylum: String,
   class: String,

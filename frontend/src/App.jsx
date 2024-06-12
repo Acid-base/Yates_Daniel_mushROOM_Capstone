@@ -7,6 +7,10 @@ import DetailsView from './components/DetailsView';
 import Error from './components/Error';
 import MushroomProvider, { MushroomContext } from './components/MushroomContext';
 import { fetchMushrooms } from './api'; // Import fetchMushrooms 
+import ProfilePage from './components/ProfilePage'; // Import ProfilePage
+import AboutPage from './components/AboutPage'; // Import AboutPage
+import BlogPage from './components/BlogPage'; // Import BlogPage using 'default'
+import PrivateRoute from './components/PrivateRoute'; // Import PrivateRoute
 
 function App() {
   const {
@@ -17,7 +21,8 @@ function App() {
     setSearchTerm,
     setCurrentPage,
     clearSelection,
-    fetchMushrooms // Now accessible from the context
+    fetchMushrooms, // Now accessible from the context
+    isAuthenticated // Add isAuthenticated from the context 
   } = useContext(MushroomContext); 
   const navigate = useNavigate(); 
   const location = useLocation();
@@ -68,6 +73,9 @@ function App() {
             }
           />
           <Route path="/mushroom/:id" element={<DetailsView />} />
+          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} /> {/* Add the ProfilePage route with PrivateRoute */}
+          <Route path="/blog" element={<BlogPage />} /> {/* Add the BlogPage route */}
+          <Route path="/about" element={<AboutPage />} /> {/* Add the AboutPage route */}
         </Routes>
       )}
 

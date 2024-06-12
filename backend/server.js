@@ -5,6 +5,7 @@ const cors = require('cors');
 const rateLimit = require('axios-rate-limit');
 require('dotenv').config(); 
 const Mushroom = require('./models/Mushroom');
+const { body, validationResult } = require('express-validator');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -92,8 +93,40 @@ fetchAndStoreMushrooms(1)
 app.use('/users', require('./routes/users'));
 
 // Register the mushrooms route
-app.use('/api/mushrooms', require('./routes/mushrooms')); 
+const mushroomsRouter = express.Router();
+mushroomsRouter.post('/mushrooms', 
+  [
+    body('scientificName').notEmpty().trim().escape(), 
+    body('latitude').isFloat(),
+    body('longitude').isFloat(),
+    body('imageUrl').optional().isURL(), 
+    // ... add validation for other fields
+  ], 
+  async (req, res) => {
+    // Validate the request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
+    try {
+      const newMushroom = new Mushroom(req.body);
+      await newMushroom.save();
+      res.status(201).json(newMushroom);
+    } catch (error) {
+      console.error('Error creating mushroom:', error);
+      if (error.code === 11000) {
+        res.status(409).json({ error: 'A mushroom with this scientific name already exists' });
+      } else {
+        res.status(500).json({ error: 'Failed to create mushroom' });
+      }
+    }
+  }
+);
+app.use('/api/mushrooms', mushroomsRouter); 
+
+// Register the blog routes
+app.use('/api/blog', require('./routes/blog'));
 // Start the Server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
