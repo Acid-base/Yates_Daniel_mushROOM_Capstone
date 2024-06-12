@@ -6,7 +6,8 @@ const rateLimit = require('axios-rate-limit');
 
 const app = express();
 const port = process.env.PORT || 3001;
-const databaseUri = process.env.MONGODB_URI
+const databaseUri = process.env.MONGODB_URI;
+
 
 // Rate limiting (adjust as needed)
 const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
@@ -16,7 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect(databaseUri, { useNewUrlParser: true, useUnifiedTopology: true  })
+mongoose.connect(databaseUri, {   })
   .then(() => console.log('Connected to MongoDB'))
   .catch(error => console.error('MongoDB connection error:', error));
 
@@ -50,17 +51,22 @@ async function fetchAndStoreMushrooms(page = 1) {
       },
     });
 
-    const newMushrooms = response.data.results.map(observation => ({
-      scientificName: observation.consensus.name || 'N/A',
-      latitude: observation.latitude || 0, 
-      longitude: observation.longitude || 0, 
-      imageUrl: observation.primary_image?.medium_url || 'placeholder.jpg', 
-      description: observation.description || '',
-      commonName: observation.consensus.matched_name || 'N/A',
-      family: observation.consensus.ancestor_rank_names['family'] || 'N/A',
-      genus: observation.consensus.ancestor_rank_names['genus'] || 'N/A'
-      // ... map other fields as needed, using the correct paths from the api2 response
-    }));
+    const newMushrooms = response.data.results.map(observation => {
+      // Log observation here
+      log(observation); 
+
+      return {
+        scientificName: observation.consensus.name || 'N/A',
+        latitude: observation.latitude || 0, 
+        longitude: observation.longitude || 0, 
+        imageUrl: observation.primary_image?.medium_url || 'placeholder.jpg', 
+        description: observation.description || '',
+        commonName: observation.consensus.matched_name || 'N/A',
+        family: observation.consensus.ancestor_rank_names['family'] || 'N/A',
+        genus: observation.consensus.ancestor_rank_names['genus'] || 'N/A'
+        // ... map other fields as needed, using the correct paths from the api2 response
+      };
+    });
 
     // Use bulkWrite with upsert: true to avoid duplicates
     const insertResult = await Mushroom.bulkWrite(newMushrooms.map(mushroom => ({
@@ -83,6 +89,16 @@ async function fetchAndStoreMushrooms(page = 1) {
   }
 }
 
+// Logging function
+function log(message) {
+  if (typeof console !== 'undefined' && console.log) {
+    console.log(message); 
+  } else {
+    // You can handle logging differently, like writing to a file:
+    // const fs = require('fs');
+    // fs.writeFileSync('logs.txt', message + '\n', { flag: 'a' }); 
+  }
+}
 // Example usage: Fetch data when the server starts
 fetchAndStoreMushrooms(1)
   .then(() => console.log("Initial data fetch complete!"))
@@ -94,4 +110,3 @@ fetchAndStoreMushrooms(1)
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
-
