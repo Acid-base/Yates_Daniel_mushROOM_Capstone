@@ -1,8 +1,10 @@
 const axios = require('axios');
 const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables from .env
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/your_database_name', { // Use your database name
+// Connect to MongoDB (updated to use MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI, { 
+    
 })
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
