@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const rateLimit = require('axios-rate-limit');
 require('dotenv').config(); // Load environment variables at the top
-const Mushroom = require('./models/Mushroom'); // Import the Mushroom model
+const Mushroom = require('./models/mushroom'); // Import the Mushroom model
 
 const app = express();
 const port = process.env.PORT || 3001;
