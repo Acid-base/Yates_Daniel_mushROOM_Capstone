@@ -1,0 +1,103 @@
+{
+    "allowAnonymousTelemetry": false,
+    "models": [
+        {
+            "title": "Gemini 1.5 Pro",
+            "model": "gemini-1.5-pro-latest",
+            "contextLength": 1000000,
+            "apiKey": "AIzaSyAG6G_N3WX714PgXTJuPEcMOpmA2RTFD9c",
+            "provider": "gemini"
+        },
+        {
+            "title": "Gemini 1.5 Flash",
+            "model": "gemini-1.5-flash-latest",
+            "contextLength": 1000000,
+            "apiKey": "AIzaSyAG6G_N3WX714PgXTJuPEcMOpmA2RTFD9c",
+            "provider": "gemini"
+        },
+        {
+            "title": "Gemini Pro",
+            "provider": "gemini",
+            "model": "gemini-pro",
+            "apiKey": "AIzaSyAG6G_N3WX714PgXTJuPEcMOpmA2RTFD9c"
+        },
+        {
+            "title": "Local Ollama",
+            "provider": "ollama",
+            "model": "AUTODETECT"
+        }
+    ],
+    "systemMessage": "Prioritize solutions using functional, then declarative styles before others.  Pure functions should be the preferred solution when possible. Prototypal objects are acceptable but try to avoid OOP.",
+    "completionOptions": {
+        "temperature": 0.0,
+        "topP": 0.9,
+        "maxTokens": 2000,
+        "topK":40 
+    },
+    "slashCommands": [
+        {
+            "name": "issue",
+            "description": "Generate a GitHub issue draft",
+            "params": {
+                "repositoryUrl": ""
+            }
+        },
+        {
+            "name": "so",
+            "description": "Search Stack Overflow for MERN stack solutions"
+        },
+        {
+            "name": "cmd",
+            "description": "Generate terminal commands for MERN stack development"
+        }
+    ],
+    "customCommands": [
+        {
+            "name": "test",
+            "prompt": "{{{ input }}}\n\nWrite a comprehensive set of Jest unit tests for the selected code, considering edge cases and best practices for testing React components, Redux actions/reducers, and Express routes. Give the tests just as chat output, don't edit any file.",
+            "description": "Generate unit tests for MERN stack code"
+        },
+        {
+            "name": "optimize",
+            "prompt": "{{{ input }}}\n\nSuggest optimizations for this code focusing on performance and scalability in the context of a MERN stack application.",
+            "description": "Optimize MERN stack code"
+        }
+    ],
+    "contextProviders": [
+        {
+            "name": "google",
+            "params": {
+                "serperApiKey": ""
+            }
+        },
+        {
+            "name": "diff",
+            "params": {}
+        },
+        {
+            "name": "terminal",
+            "params": {}
+        },
+        {
+            "name": "locals",
+            "params": {}
+        },
+        {
+            "name": "codebase",
+            "params": {}
+        }
+    ],
+
+    
+    "tabAutocompleteModel": {
+        "title": "Tab Autocomplete Model",
+        "provider": "ollama",
+        "model": "deepseek-coder:latest"
+    },
+    "ui": {
+        
+    },
+       "modelRoles": {
+            "inlineEdit": "deepseek-coder:latest"
+        }
+    }
