@@ -29,7 +29,8 @@ const MushroomSchema = new mongoose.Schema({
   description: String,
   commonName: String,
   family: String,
-  genus: String
+  genus: String,
+  region: String, // Added region field
   // ... add other relevant fields
 });
 
@@ -58,6 +59,8 @@ async function fetchAndStoreMushrooms(page = 1) {
         genus = observation.consensus.ancestor_rank_names['genus'] || 'N/A';
       }
 
+      // Determine the region based on latitude and longitude
+      let region = getRegionFromCoordinates(observation.latitude, observation.longitude); 
       return {
         scientificName: observation.consensus.name || 'N/A',
         latitude: observation.latitude || 0, 
@@ -67,13 +70,19 @@ async function fetchAndStoreMushrooms(page = 1) {
         commonName: observation.consensus.matched_name || 'N/A',
         family,
         genus,
+        region, // Added region field
         // ... map other fields as needed, using the correct paths from the api2 response
       };
     });
 
-    // Use insertMany for efficiency
-    await Mushroom.insertMany(newMushrooms, { ordered: false, upsert: true });
-
+    // Use bulkWrite with upsert: true to avoid duplicates
+    const insertResult = await Mushroom.bulkWrite(newMushrooms.map(mushroom => ({
+      updateOne: {
+        filter: { scientificName: mushroom.scientificName, latitude: mushroom.latitude, longitude: mushroom.longitude },
+        update: { $set: mushroom },
+        upsert: true
+      }
+    })));
     console.log(`Processed ${newMushrooms.length} mushrooms for page ${page}`);
     // Handle pagination
     if (response.data.more) {
@@ -85,6 +94,15 @@ async function fetchAndStoreMushrooms(page = 1) {
   }
 }
 
+// Helper function to get the region from coordinates (you'll need to implement this)
+function getRegionFromCoordinates(latitude, longitude) {
+  // ... Use geocoding service or a region lookup database to determine the region.
+  // Example (using a lookup table, you'll need to create a regions database or use a pre-built library):
+  // const regions = require('./regions.json'); // Replace with your regions lookup data
+  // return regions.find(region => latitude >= region.latMin && latitude <= region.latMax && longitude >= region.lonMin && longitude <= region.lonMax)?.name || 'Unknown'; 
+  // You can also use an external API like Google Maps API or a geocoding library
+  return 'Unknown'; // Placeholder - replace with your actual region determination logic
+}
 // Logging function
 function log(message) {
   if (typeof console !== 'undefined' && console.log) {
@@ -102,6 +120,8 @@ fetchAndStoreMushrooms(1)
 
 // ... your API routes for /api/mushrooms (using the Mushroom model)
 
+// Register the user routes
+app.use('/users', require('./routes/users'));
 // Start the Server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

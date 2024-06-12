@@ -3,9 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const Mushroom = require('../mongo/models/Mushroom'); // Import the Mushroom model
+const authenticateToken = require('../middleware/auth'); // Import auth middleware
 console.log(__dirname)
 // GET /mushrooms - Get a list of mushrooms
-router.get('/', async (req, res) => {
+// Protected route - requires authentication 
+router.get('/', authenticateToken, async (req, res) => {
   const searchTerm = req.query.q; // Get the search term from the query parameter (e.g., /mushrooms?q=chanterelle)
 
   try { 

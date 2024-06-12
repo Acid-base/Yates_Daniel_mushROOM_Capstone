@@ -23,7 +23,25 @@ const MushroomSchema = new mongoose.Schema({
   distribution: String,
   // Optional: Links for further information
   wikipediaUrl: String,
-  mushroomObserverUrl: String 
+  mushroomObserverUrl: String,
+
+  // Add a field to store user favorites
+  favorites: [{
+    userId: { 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    favoritedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  
+  // Add a field for region data
+  region: {
+    type: String, 
+  }
 });
 
 const Mushroom = mongoose.model('Mushroom', MushroomSchema);
