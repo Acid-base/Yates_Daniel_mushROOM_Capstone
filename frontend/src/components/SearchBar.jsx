@@ -55,7 +55,7 @@ function SearchBar({ onSearchChange }) {
   // Function to fetch results based on the current search term and page.
   const fetchResults = useCallback(async () => {
     try {
-      // Construct the API URL for your local MongoDB.
+      // Fetch from your local backend
       const apiUrl = `/api/mushrooms?name=${searchTerm}&page=${currentPage}`;
       // Make the fetch request to the constructed API URL.
       const response = await fetch(apiUrl);

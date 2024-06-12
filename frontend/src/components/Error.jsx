@@ -1,19 +1,17 @@
 // src/components/Error.jsx - A simple component to display errors
-
-// Import React 
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
+import PropTypes from 'prop-types'; // Import PropTypes
 
-// Functional component for Error
-function Error({ message }) {
-  // Return a div containing the error message
-  return (
-    <div className="error-message">
-      <p>{message}</p>
-    </div>
-  );
-}
+const Error = ({ message }) => (
+  <div className="error-message">
+    <p>{message}</p>
+  </div>
+);
 
-// Export the Error component as the default export
+// Add prop validation
+Error.propTypes = {
+  message: PropTypes.string.isRequired 
+};
+
 export default Error;
-
-

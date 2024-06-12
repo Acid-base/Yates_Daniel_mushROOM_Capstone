@@ -1,27 +1,30 @@
 // DetailsView.jsx 
-// Import React and useContext for using React Context API.
+// eslint-disable-next-line no-unused-vars
 import React, { useContext } from 'react';
-// Import the MushroomContext to access shared data.
-import MushroomContext from './MushroomContext'; // Import the named export 
+import { Link } from 'react-router-dom'; // Import Link for navigation
+import MushroomContext from './MushroomContext'; 
 
-// Define the DetailsView functional component.
 function DetailsView() {
-  // Get the 'selectedMushroomId' from the MushroomContext using useContext.
-  const { selectedMushroomId, mushrooms } = useContext(MushroomContext); // Access selectedMushroomId from the context
+  const { selectedMushroomId, mushrooms } = useContext(MushroomContext);
 
-  // Retrieve the selected mushroom from 'mushrooms' based on 'selectedMushroomId'.
-  // If 'selectedMushroomId' is null (no selection), 'selectedMushroom' will be null.
-  const selectedMushroom = selectedMushroomId ? mushrooms.find((mushroom) => mushroom.id === selectedMushroomId) : null; 
+  // Find the selected mushroom directly in the render method
+  const selectedMushroom = mushrooms.find(
+    (mushroom) => mushroom.id === selectedMushroomId
+  );
 
-  // If no mushroom is selected ('selectedMushroom' is null), render a message.
+  // If no mushroom is found, display a message 
   if (!selectedMushroom) {
     return <div>Select a mushroom to view details.</div>;
   }
 
-  // ... (render details of the 'selectedMushroom' here)
+  return (
+    <div>
+      {/* Back button to the home page */}
+      <Link to="/">Back to Home</Link> 
+      <h2>{selectedMushroom.scientificName}</h2>
+      <img src={selectedMushroom.imageUrl} alt={selectedMushroom.scientificName} />
+      {/* ... other details */}
+    </div>
+  );
 }
-
-// Export the DetailsView component as the default export.
 export default DetailsView;
-
-
