@@ -3,8 +3,8 @@ const router = express.Router();
 const authenticateToken = require('../middleware/auth'); // Import middleware
 
 const userController = require('../controllers/userController');
-const Mushroom = require('../models/Mushroom'); // Assuming you have a Mushroom model
-const User = require('../models/User'); // Assuming you have a User model
+const Mushroom = require('../models/MushroomModel'); // Assuming you have a Mushroom model
+const User = require('../models/UserModel'); // Assuming you have a User model
 
 // Protected route (requires authentication)
 router.get('/', authenticateToken, async (req, res) => {

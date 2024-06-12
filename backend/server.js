@@ -1,11 +1,3 @@
-const express = require('express');
-const axios = require('axios');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const rateLimit = require('axios-rate-limit');
-require('dotenv').config(); 
-const Mushroom = require('./models/Mushroom');
-const { body, validationResult } = require('express-validator');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -90,7 +82,8 @@ fetchAndStoreMushrooms(1)
 // ... (Your other code)
 
 // Register the user routes
-app.use('/users', require('./routes/users'));
+const users = require('./routes/UserRoutes'); // Import and assign the router
+app.use('/users', users); 
 
 // Register the mushrooms route
 const mushroomsRouter = express.Router();
@@ -126,7 +119,7 @@ mushroomsRouter.post('/mushrooms',
 app.use('/api/mushrooms', mushroomsRouter); 
 
 // Register the blog routes
-app.use('/api/blog', require('./routes/blog'));
+app.use('/api/blog', require('./routes/BlogRoutes'));
 // Start the Server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

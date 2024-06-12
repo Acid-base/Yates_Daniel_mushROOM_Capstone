@@ -1,7 +1,7 @@
 // routes/blog.js
 const express = require('express');
 const router = express.Router();
-const BlogPost = require('../models/BlogPost'); // Import BlogPost model
+const BlogPost = require('../models/BlogPostModel'); // Import BlogPost model
 
 router.get('/', async (req, res) => {
   try {
