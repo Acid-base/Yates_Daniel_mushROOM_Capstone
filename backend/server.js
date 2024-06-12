@@ -8,7 +8,6 @@ const app = express();
 const port = process.env.PORT || 3001;
 const databaseUri = process.env.MONGODB_URI;
 
-
 // Rate limiting (adjust as needed)
 const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
 
@@ -23,7 +22,7 @@ mongoose.connect(databaseUri, {   })
 
 // Define your Mushroom schema 
 const MushroomSchema = new mongoose.Schema({
-  scientificName: { type: String, required: true },
+  scientificName: { type: String, required: true, unique: true }, // Add unique index
   latitude: { type: Number, required: true }, 
   longitude: { type: Number, required: true },
   imageUrl: String,
@@ -45,15 +44,19 @@ async function fetchAndStoreMushrooms(page = 1) {
         detail: 'high', // Important for nested data 
         page: page,
       },
-      headers: {
-        // You likely don't need an API key for GET requests in api2, but double-check the documentation
-        // 'Authorization': `Bearer ${mushroomObserverApiKey}`, 
-      },
     });
 
     const newMushrooms = response.data.results.map(observation => {
       // Log observation here
-      log(observation); 
+      // log(observation); 
+
+      let family = 'N/A'; 
+      let genus = 'N/A';
+
+      if (observation.consensus.ancestor_rank_names) {
+        family = observation.consensus.ancestor_rank_names['family'] || 'N/A';
+        genus = observation.consensus.ancestor_rank_names['genus'] || 'N/A';
+      }
 
       return {
         scientificName: observation.consensus.name || 'N/A',
@@ -62,30 +65,23 @@ async function fetchAndStoreMushrooms(page = 1) {
         imageUrl: observation.primary_image?.medium_url || 'placeholder.jpg', 
         description: observation.description || '',
         commonName: observation.consensus.matched_name || 'N/A',
-        family: observation.consensus.ancestor_rank_names['family'] || 'N/A',
-        genus: observation.consensus.ancestor_rank_names['genus'] || 'N/A'
+        family,
+        genus,
         // ... map other fields as needed, using the correct paths from the api2 response
       };
     });
 
-    // Use bulkWrite with upsert: true to avoid duplicates
-    const insertResult = await Mushroom.bulkWrite(newMushrooms.map(mushroom => ({
-      updateOne: {
-        filter: { scientificName: mushroom.scientificName, latitude: mushroom.latitude, longitude: mushroom.longitude }, 
-        update: { $set: mushroom }, 
-        upsert: true
-      }
-    })));
+    // Use insertMany for efficiency
+    await Mushroom.insertMany(newMushrooms, { ordered: false, upsert: true });
 
-    console.log(`Processed ${newMushrooms.length} mushrooms (Inserted: ${insertResult.upsertedCount}, Updated: ${insertResult.modifiedCount}) for page ${page}`);
-
+    console.log(`Processed ${newMushrooms.length} mushrooms for page ${page}`);
     // Handle pagination
     if (response.data.more) {
       await fetchAndStoreMushrooms(page + 1); 
     }
   } catch (error) {
     console.error('Error fetching or storing mushroom data:', error);
-    // ... Additional error handling 
+    // Additional error handling logic (e.g., retry with exponential backoff)
   }
 }
 
