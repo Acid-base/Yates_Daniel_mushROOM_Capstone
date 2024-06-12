@@ -3,41 +3,36 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'; // Import PropTypes
 import './MushroomCard.css'; 
 function MushroomCard({ mushroom, onSelect }) {
-  const [showDetails, setShowDetails] = useState(false); 
-  const [isFavorite, setIsFavorite] = useState(false); // Track if the mushroom is favorited
-  const [region, setRegion] = useState('Unknown'); // State for region
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [region, setRegion] = useState('Unknown'); 
   const imageUrl = mushroom.primary_image?.medium_url || 'placeholder-image.jpg';
 
   useEffect(() => {
-    // Load favorite status from local storage or set default
-    const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    setIsFavorite(savedFavorites.includes(mushroom.id));
+    // Check if the mushroom is in the user's favorites in local storage
+    const favoriteIds = getFavoritesFromLocalStorage();
+    setIsFavorite(favoriteIds.includes(mushroom.id));
   }, [mushroom.id]);
 
+  // Fetch region from Nominatim (if not already in local storage)
   useEffect(() => {
-    // Fetch region data when the component mounts
-    if (mushroom.latitude && mushroom.longitude) {
+    const storedRegion = getRegionFromLocalStorage(mushroom.id);
+    if (storedRegion) {
+      setRegion(storedRegion);
+    } else {
       fetchRegionFromNominatim(mushroom.latitude, mushroom.longitude)
         .then(regionData => {
           setRegion(regionData || 'Unknown');
+          storeRegionInLocalStorage(mushroom.id, regionData);
         })
         .catch(error => {
           console.error('Error fetching region from Nominatim:', error);
         });
     }
-  }, [mushroom.latitude, mushroom.longitude]);
+  }, [mushroom.latitude, mushroom.longitude, mushroom.id]);
+
   const handleFavoriteToggle = () => {
     setIsFavorite(!isFavorite);
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    if (isFavorite) {
-      // Remove from favorites
-      const updatedFavorites = favorites.filter(id => id !== mushroom.id);
-      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-    } else {
-      // Add to favorites
-      favorites.push(mushroom.id);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-    }
+    updateFavoritesInLocalStorage(mushroom.id, !isFavorite); 
   };
 
   // Function to fetch region data from Nominatim
@@ -52,6 +47,36 @@ function MushroomCard({ mushroom, onSelect }) {
     }
   }
 
+  // Function to get region from local storage
+  function getRegionFromLocalStorage(mushroomId) {
+    const regions = JSON.parse(localStorage.getItem('regions')) || {};
+    return regions[mushroomId];
+  }
+
+  // Function to store region in local storage
+  function storeRegionInLocalStorage(mushroomId, region) {
+    const regions = JSON.parse(localStorage.getItem('regions')) || {};
+    regions[mushroomId] = region;
+    localStorage.setItem('regions', JSON.stringify(regions));
+  }
+
+  // Function to get favorites from local storage
+  function getFavoritesFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('favorites')) || [];
+  }
+
+  // Function to update favorites in local storage
+  function updateFavoritesInLocalStorage(mushroomId, isFavorite) {
+    let favorites = getFavoritesFromLocalStorage();
+    if (isFavorite) {
+      if (!favorites.includes(mushroomId)) {
+        favorites.push(mushroomId);
+      }
+    } else {
+      favorites = favorites.filter(id => id !== mushroomId);
+    }
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }
   return (
     <li 
       className="mushroom-card" 

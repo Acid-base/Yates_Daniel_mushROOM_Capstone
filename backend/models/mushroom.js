@@ -5,6 +5,14 @@ const MushroomSchema = new mongoose.Schema({
   // Basic Information
   scientificName: { type: String, required: true, unique: true }, // Unique scientific name
   commonName: { type: String, required: true },
+  // Location
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
+  // Image Information
+  imageUrl: { type: String, required: true }, // Primary image URL
+  additionalImages: [String], // Array to store additional image URLs 
+  // Description (can be more detailed if needed)
+  description: String,
   // Taxonomy
   kingdom: String,
   phylum: String,
@@ -12,11 +20,6 @@ const MushroomSchema = new mongoose.Schema({
   order: String,
   family: String,
   genus: String,
-  // Description (can be more detailed if needed)
-  description: String,
-  // Image Information
-  imageUrl: { type: String, required: true }, // Primary image URL
-  additionalImages: [String], // Array to store additional image URLs 
   // Optional: Additional details
   habitat: String,
   edibility: String, // Edible, poisonous, etc.

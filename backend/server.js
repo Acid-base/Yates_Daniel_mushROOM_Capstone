@@ -3,6 +3,8 @@ const axios = require('axios');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const rateLimit = require('axios-rate-limit');
+require('dotenv').config(); // Load environment variables at the top
+const Mushroom = require('./models/Mushroom'); // Import the Mushroom model
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -16,25 +18,15 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect(databaseUri, {   })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(error => console.error('MongoDB connection error:', error));
-
-// Define your Mushroom schema 
-const MushroomSchema = new mongoose.Schema({
-  scientificName: { type: String, required: true, unique: true }, // Add unique index
-  latitude: { type: Number, required: true }, 
-  longitude: { type: Number, required: true },
-  imageUrl: String,
-  description: String,
-  commonName: String,
-  family: String,
-  genus: String,
-  region: String, // Added region field
-  // ... add other relevant fields
-});
-
-const Mushroom = mongoose.model('Mushroom', MushroomSchema);
+mongoose.connect(databaseUri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+    // Start your server or perform other actions
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error); 
+    // Handle the error appropriately
+  });
 
 // --- Function to fetch and store mushroom data ---
 async function fetchAndStoreMushrooms(page = 1) {
