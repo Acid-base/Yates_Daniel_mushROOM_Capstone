@@ -1,203 +1,116 @@
-// server.js
+const rateLimit = require('axios-rate-limit');
+const axios = require('axios');
 const express = require('express');
 const mongoose = require('mongoose');
-const axios = require('axios');
-const rateLimit = require('axios-rate-limit');
-const { APIError, DatabaseError } = require('./middleware/customErrors');
-const Mushroom = require('./models/MushroomModel');
-const User = require('./models/UserModel');
-const BlogPost = require('./models/BlogPostModel');
-
-const logger = require('./middleware/logger');
-const authenticateToken = require('./middleware/auth');
-const userRoutes = require('./routes/UserRoutes');
-const mushroomRouter = require('./routes/MushroomRoutes'); 
-const cacheManager = require('./data/cacheManager.js');
-const blogRouter = require('./routes/BlogRoutes');
-const blogController = require('./controllers/blogController');
-const db = require('./data/db'); 
-const mushroomService = require('./data/db'); // Import from db.js
-// Removed the fetchDataFromAPI and fetchAndStoreMushroomData functions from here 
-// require('dotenv').config();
+require('dotenv').config(); 
 
 const cors = require('cors');
-const { body, validationResult } = require('express-validator'); 
+const { body, validationResult } = require('express-validator');
+
+const Mushroom = require('./models/MushroomModel');
+const mushroomsRouter = require('./routes/MushroomRoutes'); 
+const userRouter = require('./routes/UserRoutes');
+const blogRouter = require('./routes/BlogRoutes');
+
+// ... (other requires)
 
 const app = express();
-const port = 3001;
-// Removed the fetchDataFromAPI and fetchAndStoreMushroomData functions from here 
-app.listen(port, async () => {
-  try {
-    await db.connectToDatabase();
-    console.log(`Mushroom Explorer backend listening at http://localhost:${port}`);
-
-    // Call fetchAndStoreMushroomData 
-    await mushroomService.fetchAndStoreMushroomData(); 
 const port = process.env.PORT || 3001;
-const databaseUri = process.env.MONGODB_URI;
+const databaseUri = process.env.MONGODB_URI
 
-const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10, // Limit each IP to 10 requests per windowMs
-  message: 'Too many requests, please try again later.'
-});
+// Rate limiting (adjust as needed)
+const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
 
-app.use('/api', apiLimiter);
-app.use(cors());
+// Middleware
 app.use(express.json());
+app.use(cors());
 
-mongoose.connect(databaseUri, { useNewUrlParser: true, useUnifiedTopology: true })
+// MongoDB Connection
+mongoose.connect(databaseUri, {  })
   .then(() => {
     console.log('Connected to MongoDB');
-    // Start fetching mushrooms data once MongoDB connection is established
-    fetchAllMushrooms();
+
+    // *** Initial Data Fetch Example *** 
+
+    // Function to fetch mushroom data
+    async function fetchMushroomData(scientificName) {
+      try {
+        // 1. Fetch Name Data
+        const nameResponse = await axios.get(
+          `https://mushroomobserver.org/api2/names?name=${scientificName}`
+        );
+        const nameData = nameResponse.data[0]; // Assuming the API returns an array of names
+
+        // 2. Fetch Observation Data (for images and details)
+        const observationResponse = await axios.get(
+          `https://mushroomobserver.org/api2/observations?name=${scientificName}`
+        );
+        const observationData = observationResponse.data;
+
+        // 3. Combine Data from Different Endpoints
+        const mushroomData = {
+          scientificName: nameData.text_name,
+          latitude: nameData.latitude || null, // Use null if latitude is missing
+          longitude: nameData.longitude || null, // Use null if longitude is missing
+          imageUrl:
+            observationData.images && observationData.images.length > 0
+              ? observationData.images[0].url
+              : null, // Handle cases where no images are available
+          description: nameData.description,
+          commonName: nameData.common_name,
+          family: nameData.family,
+          genus: nameData.genus,
+          region: nameData.region || null, // Use null if region is missing
+          gallery: observationData.images
+            ? observationData.images.map((image) => ({
+                url: image.url,
+                thumbnailUrl: image.thumbnail_url || null, // Use null if thumbnail is missing
+              }))
+            : [], // Return an empty array if no images are found
+          kingdom: nameData.kingdom,
+          phylum: nameData.phylum,
+          class: nameData.class,
+          order: nameData.order,
+          habitat: nameData.habitat,
+          edibility: nameData.edibility, // Assuming the API provides edibility information
+          distribution: nameData.distribution,
+          wikipediaUrl: nameData.wikipedia_url,
+          mushroomObserverUrl: `https://mushroomobserver.org/name/${nameData.id}`,
+        };
+
+        return mushroomData;
+      } catch (error) {
+        console.error(`Error fetching data for ${scientificName}:`, error);
+        throw error;
+      }
+    }
+
+    // Example Usage:
+    fetchMushroomData("Amanita muscaria")
+      .then((mushroomData) => {
+        // Create a new Mushroom document with the fetched data
+        const mushroom = new Mushroom(mushroomData);
+        // Save the document to MongoDB
+        return mushroom.save();
+      })
+      .then((savedMushroom) => {
+        console.log("Mushroom data saved successfully:", savedMushroom);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error('MongoDB connection error:', error); 
   });
 
-const api = axios.create();
 
-async function fetchMushroomData(observationId) {
-  try {
-    const observationResponse = await api.get(
-      `https://mushroomobserver.org/api2/observations/${observationId}?detail=high&format=json`
-    );
-    const observation = observationResponse.data.results[0];
+// Register routes
+app.use('/api/mushrooms', mushroomsRouter);
+app.use('/users', userRouter); 
+app.use('/api/blog', blogRouter); 
 
-    if (!observation || !observation.name_id) {
-      console.warn(`Skipping observation ID: ${observationId} due to missing or invalid data.`);
-      return null; // Return null to indicate invalid data
-    }
-
-    const nameId = observation.name_id;
-    const nameResponse = await api.get(
-      `https://mushroomobserver.org/api2/names?id=${nameId}&detail=high&format=json`
-    );
-    const nameDetails = nameResponse.data.results[0];
-
-    const mushroomData = {
-      scientificName: nameDetails.text_name,
-      latitude: observation.latitude || null,
-      longitude: observation.longitude || null,
-      imageUrl:
-        observation.primary_image
-          ? `https://mushroomobserver.org/images/${observation.primary_image}`
-          : null,
-      description: nameDetails.description,
-      commonName: nameDetails.common_name,
-      family: nameDetails.family,
-      genus: nameDetails.genus,
-      region: observation.location_name || null,
-      gallery: observation.images
-        ? observation.images.map((image) => ({
-            url: `https://mushroomobserver.org/images/${image}`,
-            thumbnailUrl: `https://mushroomobserver.org/images/thumbnails/${image}` || null,
-          }))
-        : [],
-      kingdom: nameDetails.kingdom,
-      phylum: nameDetails.phylum,
-      class: nameDetails.class,
-      order: nameDetails.order,
-      habitat: nameDetails.habitat,
-      edibility: nameDetails.edibility,
-      distribution: nameDetails.distribution,
-      wikipediaUrl: nameDetails.wikipedia_url,
-      mushroomObserverUrl: `https://mushroomobserver.org/name/${nameDetails.id}`,
-    };
-
-    return mushroomData;
-  } catch (error) {
-    console.error('Error starting the server:', error); 
-  }
-    console.error("Error fetching mushroom data:", error.message);
-    throw error;
-  }
-}
-
-async function fetchAndSaveMushroom(observationId) {
-  try {
-    const mushroomData = await fetchMushroomData(observationId);
-    if (!mushroomData) {
-      // Skip if mushroomData is null due to invalid data
-      return null;
-    }
-
-    const existingMushroom = await Mushroom.findOne({
-      scientificName: mushroomData.scientificName,
-      mushroomObserverUrl: mushroomData.mushroomObserverUrl,
-    });
-
-    if (!existingMushroom) {
-      const newMushroom = new Mushroom(mushroomData);
-      await newMushroom.save();
-      return newMushroom;
-    } else {
-      return existingMushroom;
-    }
-  } catch (error) {
-    console.error(`Error fetching and saving mushroom with observation ID: ${observationId}`, error.message);
-    throw error;
-  }
-}
-
-async function fetchAllMushrooms() {
-  let pageNumber = 1;
-  let totalPages = 1;
-
-  while (pageNumber <= totalPages) {
-    try {
-      const response = await api.get(
-        `https://mushroomobserver.org/api2/observations?name=Agaricus&detail=low&format=json&page=${pageNumber}`
-      );
-
-      const { results, number_of_pages } = response.data;
-      totalPages = number_of_pages;
-
-      for (const observation of results) {
-        const observationId = observation.id;
-        let retryCount = 0;
-        let mushroomData = null;
-
-        // Retry mechanism with exponential backoff for rate limits
-        while (retryCount < 3) {
-          try {
-            mushroomData = await fetchAndSaveMushroom(observationId);
-            break; // Break loop if successful
-          } catch (error) {
-            if (error.response && error.response.status === 429) {
-              // Rate limit exceeded, implement backoff
-              const backoffDelay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-              console.warn(`Rate limit exceeded. Retrying in ${backoffDelay / 1000} seconds.`);
-              await new Promise((resolve) => setTimeout(resolve, backoffDelay));
-            } else {
-              // Other errors, log and skip observation
-              console.error(`Error fetching and saving mushroom with observation ID: ${observationId}`, error.message);
-              break; // Exit retry loop on non-rate-limit errors
-            }
-          }
-          retryCount++;
-        }
-
-        if (!mushroomData) {
-          console.warn(`Skipping observation ID: ${observationId} after ${retryCount} attempts.`);
-        }
-      }
-
-      pageNumber += 1;
-    } catch (error) {
-      console.error("Error fetching observations:", error.message);
-      break;
-    }
-  }
-}
-
-// Express routes
-app.get('/', (req, res) => {
-  res.send('Welcome to the Mushroom Observer API integration!');
-});
-
-// Start the server
+// Start the Server 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port: ${port}`);
 });

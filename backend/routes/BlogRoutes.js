@@ -1,12 +1,11 @@
+// routes/blog.js
 const express = require('express');
-const router = express.Router(); 
-const blogController = require('../controllers/blogController');
-const authenticateToken = require('../middleware/auth'); // Assuming you need authentication
+const router = express.Router();
+const BlogPost = require('../models/BlogPostModel'); // Import BlogPost model
 
-// Get all blog posts
 router.get('/', async (req, res) => {
   try {
-    const blogPosts = await blogController.getAllBlogPosts(); 
+    const blogPosts = await BlogPost.find().sort({ date: -1 }); // Sort by date in descending order
     res.json(blogPosts);
   } catch (error) {
     console.error('Error fetching blog posts:', error);
@@ -14,8 +13,5 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Example blog routes
-router.post('/create', authenticateToken, blogController.createPost); 
-router.put('/:postId/update', authenticateToken, blogController.updatePost); 
-router.delete('/:postId', authenticateToken, blogController.deletePost); 
-module.exports = router; 
+// ... other blog routes
+module.exports = router;

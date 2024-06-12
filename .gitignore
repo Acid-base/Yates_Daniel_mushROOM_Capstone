@@ -9,7 +9,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 .pnpm-store
-
+tinuerc.json
 # Build artifacts 
 dist
 build
@@ -119,6 +119,7 @@ backend/import-csv.js
 backend/models/index.js
 backend/scripts/setup.js
 middleware/stayup.js
+.contin.json
 middleware/proxy.js
 template.json
 backend/scripts/localdatasetup.js

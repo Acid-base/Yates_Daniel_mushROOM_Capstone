@@ -1,4 +1,4 @@
-// MushroomModel.js
+// models/MushroomModel.js 
 const mongoose = require('mongoose');
 
 const MushroomSchema = new mongoose.Schema({
@@ -39,4 +39,7 @@ const MushroomSchema = new mongoose.Schema({
   }] 
 });
 
-module.exports = mongoose.model('Mushroom', MushroomSchema);
+const Mushroom = mongoose.model('Mushroom', MushroomSchema);
+
+module.exports = Mushroom; 
+

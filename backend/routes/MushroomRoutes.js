@@ -1,33 +1,20 @@
-const authenticateToken = require('../middleware/auth');
+// routes/MushroomRoutes.js
+const express = require('express');
+const router = express.Router(); 
+const { body, validationResult } = require('express-validator');
+const Mushroom = require('../models/MushroomModel'); 
 
-// GET /mushrooms - Get a list of mushrooms
-// Protected route - requires authentication 
-router.get('/', authenticateToken, async (req, res) => {
-  const searchTerm = req.query.q; 
-
-  try { 
-    let mushrooms; 
-
-    if (searchTerm) { 
-      mushrooms = await Mushroom.find({
-        $or: [
-          { commonName: { $regex: searchTerm, $options: 'i' } },
-          { scientificName: { $regex: searchTerm, $options: 'i' } }
-        ]
-      });
-    } else {
-      mushrooms = await Mushroom.find();
-    }
-
-    res.setHeader('Content-Type', 'application/json'); // Set Content-Type to JSON
-    console.log(mushrooms);
-    res.json(mushrooms); // Send the data as JSON
-
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  
-    res.status(500).json({ error: 'Error fetching data' }); 
+router.post('/',
+  [
+    body('scientificName').notEmpty().trim().escape(),
+    body('latitude').isFloat(),
+    body('longitude').isFloat(),
+    body('imageUrl').optional().isURL(),
+    // ... add validation for other fields
+  ],
+  async (req, res) => {
+    // ... (Your validation and mushroom creation logic from before)
   }
-});
+);
 
-module.exports = router;
+module.exports = router; 
