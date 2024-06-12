@@ -1,6 +1,6 @@
 // backend/services/mushroomService.js
 const axios = require('axios');
-const Mushroom = require('../models/MushroomModel');
+const Mushroom = require('../backend/models/MushroomModel');
 const { getRegionFromCoordinates } = require('../helpers'); 
 
 // Function to fetch and store mushroom data

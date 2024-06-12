@@ -1,44 +1,22 @@
-// models/mushroom.js 
+// models/MushroomModel.js 
 const mongoose = require('mongoose');
 
 const MushroomSchema = new mongoose.Schema({
   scientificName: { type: String, required: true, unique: true }, 
   latitude: { type: Number, required: true },
   longitude: { type: Number, required: true },
-  imageUrl: String,
-  description: String,
+  imageUrl: String, // Primary image URL
+  description: String, 
   commonName: String,
   family: String,
   genus: String,
-  favorites: [
-    {
-      userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    favoritedAt: {
-      type: Date,
-      default: Date.now
-    }
-    }
-  ],
   region: {
     type: String,
   },
-  // ... other relevant fields
-  // Basic Information 
-  // Location 
-  // Image Information 
-  // Description (can be more detailed if needed)
-  // Taxonomy 
-  // Optional: Additional details 
-  // Optional: Links for further information
-  // This replaces the additionalImages array with a gallery structure
-  gallery: [{
-    url: String,
-    thumbnailUrl: String
-  }], 
+  gallery: [{ 
+    url: String, // Full-size image URL
+    thumbnailUrl: String // Thumbnail image URL
+  }],
   kingdom: String,
   phylum: String,
   class: String,
@@ -48,8 +26,20 @@ const MushroomSchema = new mongoose.Schema({
   distribution: String,
   wikipediaUrl: String,
   mushroomObserverUrl: String,
+  favorites: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    favoritedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }] 
 });
 
 const Mushroom = mongoose.model('Mushroom', MushroomSchema);
 
 module.exports = Mushroom; 
+

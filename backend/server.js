@@ -1,7 +1,22 @@
+const rateLimit = require('axios-rate-limit');
+const axios = require('axios');
+const express = require('express');
+const mongoose = require('mongoose');
+require('dotenv').config(); 
+
+const cors = require('cors');
+const { body, validationResult } = require('express-validator');
+
+const Mushroom = require('./models/MushroomModel');
+const mushroomsRouter = require('./routes/MushroomRoutes'); 
+const userRouter = require('./routes/UserRoutes');
+const blogRouter = require('./routes/BlogRoutes');
+
+// ... (other requires)
 
 const app = express();
 const port = process.env.PORT || 3001;
-const databaseUri = process.env.MONGODB_URI;
+const databaseUri = process.env.MONGODB_URI
 
 // Rate limiting (adjust as needed)
 const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
@@ -14,113 +29,88 @@ app.use(cors());
 mongoose.connect(databaseUri, {  })
   .then(() => {
     console.log('Connected to MongoDB');
+
+    // *** Initial Data Fetch Example *** 
+
+    // Function to fetch mushroom data
+    async function fetchMushroomData(scientificName) {
+      try {
+        // 1. Fetch Name Data
+        const nameResponse = await axios.get(
+          `https://mushroomobserver.org/api2/names?name=${scientificName}`
+        );
+        const nameData = nameResponse.data[0]; // Assuming the API returns an array of names
+
+        // 2. Fetch Observation Data (for images and details)
+        const observationResponse = await axios.get(
+          `https://mushroomobserver.org/api2/observations?name=${scientificName}`
+        );
+        const observationData = observationResponse.data;
+
+        // 3. Combine Data from Different Endpoints
+        const mushroomData = {
+          scientificName: nameData.text_name,
+          latitude: nameData.latitude || null, // Use null if latitude is missing
+          longitude: nameData.longitude || null, // Use null if longitude is missing
+          imageUrl:
+            observationData.images && observationData.images.length > 0
+              ? observationData.images[0].url
+              : null, // Handle cases where no images are available
+          description: nameData.description,
+          commonName: nameData.common_name,
+          family: nameData.family,
+          genus: nameData.genus,
+          region: nameData.region || null, // Use null if region is missing
+          gallery: observationData.images
+            ? observationData.images.map((image) => ({
+                url: image.url,
+                thumbnailUrl: image.thumbnail_url || null, // Use null if thumbnail is missing
+              }))
+            : [], // Return an empty array if no images are found
+          kingdom: nameData.kingdom,
+          phylum: nameData.phylum,
+          class: nameData.class,
+          order: nameData.order,
+          habitat: nameData.habitat,
+          edibility: nameData.edibility, // Assuming the API provides edibility information
+          distribution: nameData.distribution,
+          wikipediaUrl: nameData.wikipedia_url,
+          mushroomObserverUrl: `https://mushroomobserver.org/name/${nameData.id}`,
+        };
+
+        return mushroomData;
+      } catch (error) {
+        console.error(`Error fetching data for ${scientificName}:`, error);
+        throw error;
+      }
+    }
+
+    // Example Usage:
+    fetchMushroomData("Amanita muscaria")
+      .then((mushroomData) => {
+        // Create a new Mushroom document with the fetched data
+        const mushroom = new Mushroom(mushroomData);
+        // Save the document to MongoDB
+        return mushroom.save();
+      })
+      .then((savedMushroom) => {
+        console.log("Mushroom data saved successfully:", savedMushroom);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   })
   .catch((error) => {
     console.error('MongoDB connection error:', error); 
   });
 
-// --- Function to fetch and store mushroom data ---
-async function fetchAndStoreMushrooms(page = 1) {
-  try {
-    const response = await api.get('https://mushroomobserver.org/api2/observations', {
-      params: {
-        format: 'json',
-        detail: 'high', 
-        page: page,
-      },
-    });
 
-    const newMushrooms = response.data.results.map(observation => {
-      let family = 'N/A'; 
-      let genus = 'N/A';
+// Register routes
+app.use('/api/mushrooms', mushroomsRouter);
+app.use('/users', userRouter); 
+app.use('/api/blog', blogRouter); 
 
-      if (observation.consensus.ancestor_rank_names) {
-        family = observation.consensus.ancestor_rank_names['family'] || 'N/A';
-        genus = observation.consensus.ancestor_rank_names['genus'] || 'N/A';
-      }
-
-      let region = getRegionFromCoordinates(observation.latitude, observation.longitude); 
-      return {
-        scientificName: observation.consensus.name || 'N/A',
-        latitude: observation.latitude || 0, 
-        longitude: observation.longitude || 0, 
-        imageUrl: observation.primary_image?.medium_url || 'placeholder.jpg', 
-        description: observation.description || '',
-        commonName: observation.consensus.matched_name || 'N/A',
-        family,
-        genus,
-        region, 
-      };
-    });
-
-    const insertResult = await Mushroom.bulkWrite(newMushrooms.map(mushroom => ({
-      updateOne: {
-        filter: { scientificName: mushroom.scientificName, latitude: mushroom.latitude, longitude: mushroom.longitude },
-        update: { $set: mushroom },
-        upsert: true
-      }
-    })));
-    console.log(`Processed ${newMushrooms.length} mushrooms for page ${page}`);
-    if (response.data.more) {
-      await fetchAndStoreMushrooms(page + 1); 
-    }
-  } catch (error) {
-    console.error('Error fetching or storing mushroom data:', error);
-  }
-}
-
-// Helper function to get the region from coordinates
-function getRegionFromCoordinates(latitude, longitude) {
-  return 'Unknown';
-}
-
-// Example usage: Fetch data when the server starts
-fetchAndStoreMushrooms(1)
-  .then(() => console.log("Initial data fetch complete!"))
-  .catch(err => console.error("Error during initial data fetch:", err));
-
-// ... (Your other code)
-
-// Register the user routes
-const users = require('./routes/UserRoutes'); // Import and assign the router
-app.use('/users', users); 
-
-// Register the mushrooms route
-const mushroomsRouter = express.Router();
-mushroomsRouter.post('/mushrooms', 
-  [
-    body('scientificName').notEmpty().trim().escape(), 
-    body('latitude').isFloat(),
-    body('longitude').isFloat(),
-    body('imageUrl').optional().isURL(), 
-    // ... add validation for other fields
-  ], 
-  async (req, res) => {
-    // Validate the request body
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const newMushroom = new Mushroom(req.body);
-      await newMushroom.save();
-      res.status(201).json(newMushroom);
-    } catch (error) {
-      console.error('Error creating mushroom:', error);
-      if (error.code === 11000) {
-        res.status(409).json({ error: 'A mushroom with this scientific name already exists' });
-      } else {
-        res.status(500).json({ error: 'Failed to create mushroom' });
-      }
-    }
-  }
-);
-app.use('/api/mushrooms', mushroomsRouter); 
-
-// Register the blog routes
-app.use('/api/blog', require('./routes/BlogRoutes'));
-// Start the Server
+// Start the Server 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });

@@ -14,3 +14,4 @@ router.get('/', async (req, res) => {
 });
 
 // ... other blog routes
+module.exports = router;
