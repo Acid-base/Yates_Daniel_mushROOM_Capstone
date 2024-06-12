@@ -1,107 +1,96 @@
 Project Root
-├── docs
-│   ├── API Reference.md
-│   ├── Contributing Guide.md
-│   ├── Overview.md
-│   └── User Guide.md
+├── frontend
+│   ├── src
+│   │   ├── components
+│   │   │   ├── BlogPost.jsx
+│   │   │   ├── MushroomCard.jsx
+│   │   │   ├── SearchBar.jsx
+│   │   │   └── UserCard.jsx
+│   │   ├── App.jsx
+│   │   ├── pages
+│   │   │   ├── Blog.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Mushrooms.jsx
+│   │   │   ├── Profile.jsx
+│   │   │   └── User.jsx
+│   │   ├── api
+│   │   │   ├── blog.js
+│   │   │   ├── mushrooms.js
+│   │   │   └── users.js
+│   │   ├── utils
+│   │   │   └── dateFormatter.js
+│   │   ├── App.css
+│   │   └── index.html
+│   ├── vite.config.js
+│   └── README.md
+├── backend
+│   ├── server.js
+│   ├── middleware
+│   │   ├── auth.js
+│   │   ├── errorHandler.js
+│   │   ├── mushroomService.js
+│   │   ├── validate.js
+│   │   └── user.js
+│   ├── routes
+│   │   ├── UserRoutes.js
+│   │   ├── BlogRoutes.js
+│   │   └── MushroomRoutes.js
+│   ├── models
+│   │   ├── BlogPostModel.js
+│   │   ├── User.js
+│   │   └── MushroomModel.js
+│   ├── helpers
+│   │   └── utils.js
+│   ├── .eslintrc.js
+│   └── eslint.config.mjs
 ├── package.json
-├── server.js
-├── src
-│   ├── App.js
-│   ├── components
-│   │   ├── MushroomCard.js
-│   │   └── SearchForm.js
-│   ├── pages
-│   │   ├── Home.js
-│   │   └── Login.js
-│   ├── services
-│   │   └── api.js
-│   ├── utils
-│   │   ├── dateFormatter.js
-│   │   └── searchFilter.js
-│   └── test
-│       ├── unit
-│       │   ├── MushroomCard.test.js
-│       │   └── SearchForm.test.js
-│       ├── integration
-│       │   ├── MushroomListIntegration.test.js
-│       │   └── AuthenticationFlow.test.js
-│       └── cypress
-│           └── integration
-│               ├── registration.spec.js
-│               └── login.spec.js
-└── vite.config.js
+└── README.md
 
-Documentation-Driven Development Plan with MERN Stack
+Getting Started
+This monorepo contains both the frontend and backend components of the Mushroom Explorer application. Here's how to set up and run the application:
 
-Project Structure
+Backend Setup
+Clone the monorepo: git clone https://github.com/Acid-base/Yates_Daniel_mushROOM_Capstone
+Navigate to the backend directory: cd backend
+Install dependencies: npm install
+Create a .env file: Create a file named .env in the backend directory and set the following environment variables:
+MONGODB_URI: Your MongoDB connection string.
+SECRET_KEY: A secret key for JWT authentication.
+Start the backend server: npm start
+Frontend Setup
+Navigate to the frontend directory: cd ../frontend
+Install dependencies: npm install
+Start the frontend development server: npm run dev
+This will open the application in your browser, and you can begin using Mushroom Explorer!
 
-docs/
-API Reference.md
-Contributing Guide.md
-Overview.md
-User Guide.md
-package.json
-server.js
-src/**
-App.js
-components/**
-MushroomCard.js
-SearchForm.js
-pages/**
-Home.js
-Login.js
-services/**
-api.js
-utils/**
-dateFormatter.js
-searchFilter.js
-test/**
-unit/**
-MushroomCard.test.js
-SearchForm.test.js
-integration/**
-MushroomListIntegration.test.js
-AuthenticationFlow.test.js
-cypress/**
-integration/**
-registration.spec.js
-login.spec.js
-vite.config.js
-Install Dependencies
+Features
+Search: Search for mushrooms by common name or scientific name.
+Details: View detailed information about individual mushrooms, including images, descriptions, and location.
+Favorites: Save your favorite mushrooms for easy access.
+User Profile: Manage your profile, view saved favorites, and update your information.
+Blog: Read mushroom-related news and articles.
+About: Learn more about the Mushroom Explorer project.
+Technologies Used
+Frontend:
 
-pnpm install
-Start Servers
+React: A JavaScript library for building user interfaces.
+Vite: A fast development server and build tool for web applications.
+React Router: A routing library for single-page applications.
+Axios: A Promise-based HTTP client for making API requests.
 
 Backend:
-node server.js
-Frontend:
-pnpm dev
-Testing Strategy
 
-We follow a test pyramid approach with Jest for unit and integration tests and Cypress for end-to-end (E2E) tests.
-Unit tests: Focus on individual components and functions.
-Integration tests: Test interactions between components and modules.
-E2E tests: Simulate real user scenarios to test the entire application flow.
-Documentation
+Node.js: JavaScript runtime environment.
+Express: A web framework for Node.js.
+Mongoose: A MongoDB object modeling tool for Node.js.
+MongoDB: A NoSQL database.
+JSON Web Tokens (JWT): A standard for securely transmitting information between parties as JSON objects.
+ESLint: A static code analysis tool for identifying and fixing problems in JavaScript code.
 
-Documentation can be found in the docs/ directory, written in Markdown and organized as follows:
 
-Overview: Project purpose, goals, and architecture.
-API Reference: Endpoints, parameters, and responses, generated using OpenAPI Generator.
-User Guide: Installation, configuration, and usage instructions.
-Contributing Guide: Code style, testing, and documentation guidelines.
-In Practice
-
-We ensure current documentation and code alignment through the following practices:
-
-Documentation first: Describe functionality before coding.
-Code generation from documentation: OpenAPI Generator is used to generate API documentation and client code from the API specification.
-Continuous documentation updates: Documentation is maintained alongside project development for accuracy.
-GitHub Actions: A GitHub Actions workflow is set up to automatically build, test, and deploy the application upon changes to the codebase or documentation.
-Running Tests
-
-pnpm test
 Future Enhancements
-
-[List any planned features or improvements to the application]
+Implement a more robust search functionality with filtering and sorting options.
+Add pagination to the search results.
+Enhance the user profile with more features, such as saving mushrooms to a list.
+Add social media sharing for mushroom details.
+Create a more visually appealing user interface.
