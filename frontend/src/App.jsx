@@ -1,66 +1,84 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import Navigation from './components/Navigation';
 import SearchBar from './components/SearchBar';
 import ResultsList from './components/ResultsList';
 import DetailsView from './components/DetailsView';
 import Error from './components/Error';
 import MushroomProvider, { MushroomContext } from './components/MushroomContext';
-import Navigation from './components/Navigation'; 
+import { fetchMushrooms } from './api'; // Import fetchMushrooms 
 
 function App() {
-  // Access values and functions from the MushroomContext.
-  const { 
-    mushrooms, 
-    loading, 
-    error, 
-    fetchMushroomsData, 
-    selectedMushroomId, 
-    clearSelection 
+  const {
+    mushrooms,
+    loading,
+    error,
+    selectedMushroomId,
+    setSearchTerm,
+    setCurrentPage,
+    clearSelection,
+    fetchMushrooms // Now accessible from the context
   } = useContext(MushroomContext); 
+  const navigate = useNavigate(); 
+  const location = useLocation();
 
   // Function to handle search term changes from SearchBar.
   const handleSearchChange = (searchTerm) => {
-    // Update the context with the new search term (assuming MushroomContext handles this)
-    // ...
+    setSearchTerm(searchTerm); 
+    setCurrentPage(1); 
+    fetchMushrooms(searchTerm, 1); 
   };
 
   // Fetch initial mushroom data when the component mounts.
   useEffect(() => {
-    fetchMushroomsData(); 
+    fetchMushrooms(); 
   }, []); 
 
+  // Handle navigation to details view or clearing selection
+  useEffect(() => {
+    if (selectedMushroomId) {
+      navigate(`/mushroom/${selectedMushroomId}`);
+    } else if (location.pathname.startsWith('/mushroom')) {
+      clearSelection();
+    }
+  }, [selectedMushroomId, navigate, location.pathname]);
+
+  // Render the application UI
   return (
-    <MushroomProvider>
-      <BrowserRouter>
-        <div className="app">
-          <Navigation /> 
-          <h1>Mushroom Explorer</h1>
+    <div>
+      <Navigation /> 
+      <h1>Mushroom Explorer</h1>
 
-          <SearchBar onSearchChange={handleSearchChange} /> 
+      <SearchBar onSearchChange={handleSearchChange} /> 
 
-          {error && <Error message={error} />}
+      {/* Display error or loading messages */}
+      {error && <Error message={error} />}
+      {loading && <p>Loading mushrooms...</p>}
 
-          {loading && <p>Loading mushrooms...</p>}
+      {/* Render routes only when data is loaded and there are mushrooms */}
+      {!loading && mushrooms.length > 0 && (
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ResultsList 
+                mushrooms={mushrooms} 
+                onMushroomSelect={clearSelection} 
+              />
+            }
+          />
+          <Route path="/mushroom/:id" element={<DetailsView />} />
+        </Routes>
+      )}
 
-          <Routes>
-            <Route path="/" element={
-              !loading && (
-                <ResultsList 
-                  mushrooms={mushrooms} 
-                  onMushroomSelect={clearSelection} 
-                />
-              )
-            } />
-            <Route path="/mushroom/:id" element={
-              selectedMushroomId && <DetailsView mushroomId={selectedMushroomId} />
-            } />
-          </Routes>
-
-        </div>
-      </BrowserRouter> 
-    </MushroomProvider>
+    </div>
   );
 }
 
-export default App;
-
+export default () => ( 
+  <MushroomProvider>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </MushroomProvider>
+);

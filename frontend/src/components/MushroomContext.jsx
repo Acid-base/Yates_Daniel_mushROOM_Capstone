@@ -1,86 +1,85 @@
-import React, { createContext, useReducer, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { fetchMushrooms } from './api.js';
-
+// MushroomContext.jsx
+import React, { createContext, useEffect, useReducer, useState } from 'react';
+import { fetchMushroomDetails, fetchMushrooms } from '../api';
 const MushroomContext = createContext();
+
 // Initial state
 const initialState = {
-  mushrooms: [],
-  loading: false,
-  error: null,
+  mushrooms: [], // Initially empty
+  loading: true, // Set loading to true initially
+  error: null,  // Initialize error to null
   selectedMushroomId: null,
-  searchTerm: '', // Initial search term
-  currentPage: 1, // Initial page
-  totalPages: 1 // Initial total pages
+  selectedMushroom: null // Add this line
 };
 
-// Reducer to manage the state
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'SET_SEARCH_RESULTS':
-      return { 
-        ...state, 
-        mushrooms: action.payload.results, 
-        totalPages: action.payload.totalPages, 
-        loading: false 
-      };
+    case 'SET_MUSHROOMS':
+      return { ...state, mushrooms: action.payload, loading: false }; 
     case 'SET_LOADING':
-      return { ...state, loading: action.payload };
+      return { ...state, loading: action.payload }; 
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false };
-    case 'SET_CURRENT_PAGE':
-      return { ...state, currentPage: action.payload };
-    case 'SET_SEARCH_TERM':
-      return { ...state, searchTerm: action.payload };
     case 'SELECT_MUSHROOM':
-      return { ...state, selectedMushroomId: action.payload };
+      return { ...state, selectedMushroomId: action.payload, loading: true }; // Set loading to true before fetching details
+    case 'SET_SELECTED_MUSHROOM': // New action for fetching details
+      return { ...state, selectedMushroom: action.payload, loading: false };
     case 'CLEAR_SELECTION':
-      return { ...state, selectedMushroomId: null };
+      return { ...state, selectedMushroomId: null, selectedMushroom: null }; 
     default:
       return state;
   }
 };
 
-// Define the Provider component
 const MushroomProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch({ type: 'SET_LOADING', payload: true }); 
+      // dispatch({ type: 'SET_LOADING', payload: true }); // Already handled in initial state
       try {
-        const data = await fetchMushrooms(state.searchTerm, state.currentPage); 
-        dispatch({ type: 'SET_SEARCH_RESULTS', payload: data }); 
+        const data = await fetchMushrooms(searchTerm, currentPage); 
+        dispatch({ type: 'SET_MUSHROOMS', payload: data });
       } catch (error) {
-        dispatch({ type: 'SET_ERROR', payload: error.message }); 
+        dispatch({ type: 'SET_ERROR', payload: error.message });
       } finally {
-        dispatch({ type: 'SET_LOADING', payload: false }); 
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
-    fetchData(); 
-  }, [state.searchTerm, state.currentPage]); 
+    fetchData(); // Fetch data initially
+  }, [searchTerm, currentPage]); 
+
+  // Fetch details when selectedMushroomId changes
+  useEffect(() => {
+    if (state.selectedMushroomId) {
+      const fetchDetails = async () => {
+        try {
+          const data = await fetchMushroomDetails(state.selectedMushroomId);
+          dispatch({ type: 'SET_SELECTED_MUSHROOM', payload: data });
+        } catch (error) {
+          dispatch({ type: 'SET_ERROR', payload: error.message });
+        }
+      };
+      fetchDetails();
+    }
+  }, [state.selectedMushroomId]);
 
   return (
     <MushroomContext.Provider value={{
       ...state,
-      // Update context functions to directly dispatch actions
-      fetchMushroomsData: (searchTerm, pageNumber) => {
-        dispatch({ type: 'SET_SEARCH_TERM', payload: searchTerm });
-        dispatch({ type: 'SET_CURRENT_PAGE', payload: pageNumber });
-      },
-      selectMushroom: (mushroomId) => dispatch({ type: 'SELECT_MUSHROOM', payload: mushroomId }),
-      clearSelection: () => dispatch({ type: 'CLEAR_SELECTION' }) 
+      setSearchTerm,
+      setCurrentPage, // Provide setCurrentPage
+      selectMushroom: (mushroomId) => dispatch({ type: 'SELECT_MUSHROOM', payload: mushroomId }), 
+      clearSelection: () => dispatch({ type: 'CLEAR_SELECTION' }),
+      fetchMushrooms // Add fetchMushrooms to the value
     }}>
       {children}
     </MushroomContext.Provider>
   );
 };
 
-// Add propTypes to MushroomProvider
-MushroomProvider.propTypes = {
-  children: PropTypes.node.isRequired
-};
-
 export { MushroomContext };
-export default MushroomProvider;
+export default MushroomProvider; 

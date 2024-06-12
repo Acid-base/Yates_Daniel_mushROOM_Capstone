@@ -2,35 +2,17 @@
 const mongoose = require('mongoose');
 
 const MushroomSchema = new mongoose.Schema({
-  // Basic Information
-  scientificName: { type: String, required: true, unique: true }, // Unique scientific name
-  commonName: { type: String, required: true },
-  // Location
+  scientificName: { type: String, required: true, unique: true }, 
   latitude: { type: Number, required: true },
   longitude: { type: Number, required: true },
-  // Image Information
-  imageUrl: { type: String, required: true }, // Primary image URL
-  additionalImages: [String], // Array to store additional image URLs 
-  // Description (can be more detailed if needed)
+  imageUrl: String,
   description: String,
-  // Taxonomy
-  kingdom: String,
-  phylum: String,
-  class: String,
-  order: String,
+  commonName: String,
   family: String,
   genus: String,
-  // Optional: Additional details
-  habitat: String,
-  edibility: String, // Edible, poisonous, etc.
-  distribution: String,
-  // Optional: Links for further information
-  wikipediaUrl: String,
-  mushroomObserverUrl: String,
-
-  // Add a field to store user favorites
-  favorites: [{
-    userId: { 
+  favorites: [
+    {
+      userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
@@ -39,12 +21,29 @@ const MushroomSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
-  }],
-  
-  // Add a field for region data
+    }
+  ],
   region: {
-    type: String, 
-  }
+    type: String,
+  },
+  // ... other relevant fields
+  // Basic Information 
+  // Location 
+  // Image Information 
+  // Description (can be more detailed if needed)
+  // Taxonomy 
+  // Optional: Additional details 
+  // Optional: Links for further information
+  additionalImages: [String], // Array to store additional image URLs 
+  kingdom: String,
+  phylum: String,
+  class: String,
+  order: String,
+  habitat: String,
+  edibility: String, // Edible, poisonous, etc.
+  distribution: String,
+  wikipediaUrl: String,
+  mushroomObserverUrl: String,
 });
 
 const Mushroom = mongoose.model('Mushroom', MushroomSchema);
