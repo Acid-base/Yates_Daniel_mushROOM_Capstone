@@ -1,0 +1,10 @@
+{
+    "name": "MushCluster",
+    "type": "mongodb-atlas",
+    "config": {
+        "clusterName": "MushCluster",
+        "readPreference": "primary",
+        "wireProtocolEnabled": false
+    },
+    "version": 1
+}
