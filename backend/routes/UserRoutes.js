@@ -1,11 +1,10 @@
-// UserRoutes.js
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import authenticateToken from '../backend/middleware/auth'; // Import middleware
-
-import userController from '../backend/controllers/userController';
-import Mushroom from '../backend/models/MushroomModel'; // Assuming you have a Mushroom model
-import User from '../backend/models/UserModel'; // Assuming you have a User model
+const authenticateToken = require('../middleware/auth'); // Import middleware
+const userController = require('../controllers/userController');
+const Mushroom = require('../models/MushroomModel'); // Assuming you have a Mushroom model
+const User = require('../models/UserModel'); // Assuming you have a User model
+const { body, validationResult } = require('express-validator');
 
 // Protected route (requires authentication)
 router.get('/', authenticateToken, async (req, res) => {
@@ -102,7 +101,6 @@ router.put('/:userId/update', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to update user' });
   }
 });
-router.post('/favorites/:mushroomId', authenticateToken, userController.toggleFavorite); 
+router.post('/favorites/:mushroomId', authenticateToken, userController.toggleFavorite);
 
-export default router;
-
+module.exports = router;
