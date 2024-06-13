@@ -1,5 +1,5 @@
 // models/BlogPost.js
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const blogPostSchema = new mongoose.Schema({
   title: {
@@ -24,4 +24,4 @@ const blogPostSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('BlogPost', blogPostSchema);
+module.exports = mongoose.model('BlogPost', blogPostSchema);

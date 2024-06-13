@@ -1,50 +1,39 @@
 // server.js
-import axios from 'axios';
-import rateLimit from 'axios-rate-limit';
-import express from 'express';
-import mongoose from 'mongoose';
-require('dotenv').config(); 
+const express = require('express');
+const mongoose = require('mongoose');
+const axios = require('axios');
+const rateLimit = require('axios-rate-limit');
+const { APIError, DatabaseError } = require('./middleware/customErrors');
+const Mushroom = require('./models/MushroomModel');
+const User = require('./models/UserModel');
+const BlogPost = require('./models/BlogPostModel');
 
-import cors from 'cors';
-const { body, validationResult } = require('express-validator');
+const logger = require('./middleware/logger');
+const authenticateToken = require('./middleware/auth');
+const userRoutes = require('./routes/UserRoutes');
+const mushroomRouter = require('./routes/MushroomRoutes'); 
+const cacheManager = require('./data/cacheManager.js');
+const blogRouter = require('./routes/BlogRoutes');
+const blogController = require('./controllers/blogController');
+const db = require('./data/db'); 
+const mushroomService = require('./data/db'); // Import from db.js
+// Removed the fetchDataFromAPI and fetchAndStoreMushroomData functions from here 
+// require('dotenv').config();
 
-import { fetchAndStoreMushroomData } from './middleware/mushroomService.js'; // Import
-
-// ... (other requires)
+const cors = require('cors');
+const { body, validationResult } = require('express-validator'); 
 
 const app = express();
-const port = process.env.PORT || 3001;
-const databaseUri = process.env.MONGODB_URI
+const port = 3001;
+// Removed the fetchDataFromAPI and fetchAndStoreMushroomData functions from here 
+app.listen(port, async () => {
+  try {
+    await db.connectToDatabase();
+    console.log(`Mushroom Explorer backend listening at http://localhost:${port}`);
 
-// Rate limiting (adjust as needed)
-const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
-
-// Middleware
-app.use(express.json());
-app.use(cors());
-
-const scientificNames = [
-  'Amanita muscaria',
-  'Boletus edulis',
-  'Cantharellus cibarius',
-  // Add more scientific names as needed
-];
-// MongoDB Connection
-mongoose.connect(databaseUri, {  })
-  .then(() => {
-    console.log('Connected to MongoDB');
-
-    // Fetch and store mushroom data for the specified scientific names
-    fetchAndStoreMushroomData(scientificNames)
-      .then(() => {
-        console.log('Mushroom data fetching and storing completed.');
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error); 
-  });
-
-// ... (rest of server.js)
+    // Call fetchAndStoreMushroomData 
+    await mushroomService.fetchAndStoreMushroomData(); 
+  } catch (error) {
+    console.error('Error starting the server:', error); 
+  }
+});
