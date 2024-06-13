@@ -41,6 +41,6 @@ const MushroomSchema = new mongoose.Schema({
 
 const Mushroom = mongoose.model('Mushroom', MushroomSchema);
 
-export default Mushroom; 
+export default MushroomModel; 
 
 
