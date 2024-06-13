@@ -1,11 +1,12 @@
-const User = require('../models/UserModel'); // Updated import
-const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Mushroom = require('../models/MushroomModel'); // Updated import
+// userController.js
+import User from '../models/UserModel';
+import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import Mushroom from '../models/MushroomModel';
 const secretKey = 'your_secret_key'; // Replace with a strong secret key
 
 // Function to register a new user
-exports.registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const hashedPassword = await bcryptjs.hash(password, 10); // Hash the password
@@ -40,7 +41,7 @@ exports.registerUser = async (req, res) => {
 };
 
 // Function to log in a user
-exports.loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -73,7 +74,7 @@ exports.loginUser = async (req, res) => {
 };
 
 // Function to get all users (for testing or admin purposes)
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -84,7 +85,7 @@ exports.getUsers = async (req, res) => {
 };
 
 // Function to toggle a mushroom as a favorite for the authenticated user
-exports.toggleFavorite = async (req, res) => {
+export const toggleFavorite = async (req, res) => {
   try {
     const userId = req.userId; // Get the user ID from the authenticated request
     const mushroomId = req.params.mushroomId; 
@@ -117,7 +118,7 @@ exports.toggleFavorite = async (req, res) => {
 };
 
 // Function to update a user's profile
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const userId = req.userId; // Get the user ID from the authenticated request
     const { name, email, password, location, avatarUrl, bio } = req.body; // Get all fields

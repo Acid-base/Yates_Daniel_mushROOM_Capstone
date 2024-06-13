@@ -2,6 +2,7 @@
   "name": "backend",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
@@ -27,7 +28,8 @@
     "node-fetch": "^3.3.2",
     "node-schedule": "^2.1.1",
     "papaparse": "^5.4.1",
-    "pug": "^3.0.3"
+    "pug": "^3.0.3",
+    "webpack": "^5.92.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.3.0",

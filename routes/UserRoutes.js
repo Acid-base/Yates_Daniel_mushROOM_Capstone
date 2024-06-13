@@ -1,10 +1,11 @@
-const express = require('express');
+// UserRoutes.js
+import express from 'express';
 const router = express.Router();
-const authenticateToken = require('../middleware/auth'); // Import middleware
+import authenticateToken from '../backend/middleware/auth'; // Import middleware
 
-const userController = require('../controllers/userController');
-const Mushroom = require('../models/MushroomModel'); // Assuming you have a Mushroom model
-const User = require('../models/UserModel'); // Assuming you have a User model
+import userController from '../backend/controllers/userController';
+import Mushroom from '../backend/models/MushroomModel'; // Assuming you have a Mushroom model
+import User from '../backend/models/UserModel'; // Assuming you have a User model
 
 // Protected route (requires authentication)
 router.get('/', authenticateToken, async (req, res) => {
@@ -103,4 +104,5 @@ router.put('/:userId/update', authenticateToken, async (req, res) => {
 });
 router.post('/favorites/:mushroomId', authenticateToken, userController.toggleFavorite); 
 
-module.exports = router;
+export default router;
+

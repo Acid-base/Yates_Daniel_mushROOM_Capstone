@@ -1,4 +1,4 @@
-// DetailsView.jsx 
+// src/components/DetailsView.jsx 
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom'; 
 import ImageGallery from 'react-image-gallery'; // Import ImageGallery
@@ -39,3 +39,4 @@ function DetailsView() {
   );
 }
 export default DetailsView;
+

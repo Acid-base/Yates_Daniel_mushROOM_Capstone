@@ -1,3 +1,4 @@
+// src/components/Navigation.jsx
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { MushroomContext } from './MushroomContext';
@@ -28,3 +29,4 @@ function Navigation() {
 }
 
 export default Navigation;
+

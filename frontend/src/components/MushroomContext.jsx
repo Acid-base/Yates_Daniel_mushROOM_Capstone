@@ -1,4 +1,4 @@
-// MushroomContext.jsx
+// src/components/MushroomContext.jsx
 import React, { createContext, useEffect, useReducer, useState } from 'react';
 import { fetchMushroomDetails, fetchMushrooms } from '../api';
 const MushroomContext = createContext();
@@ -83,3 +83,4 @@ const MushroomProvider = ({ children }) => {
 
 export { MushroomContext };
 export default MushroomProvider; 
+

@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken');
+// backend/middleware/auth.js
+import jwt from 'jsonwebtoken';
 
 const secretKey = 'your_secret_key'; // Replace with your secret key
 
@@ -20,4 +21,4 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = authenticateToken;
+export default authenticateToken;

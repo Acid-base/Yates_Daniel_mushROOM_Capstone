@@ -1,10 +1,11 @@
-// MushroomCard.jsx 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'; // Import PropTypes
 import './MushroomCard.css'; 
+
 function MushroomCard({ mushroom, onSelect }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [region, setRegion] = useState('Unknown'); 
+  const [showDetails, setShowDetails] = useState(false); // Add state for details card visibility
   const imageUrl = mushroom.primary_image?.medium_url || 'placeholder-image.jpg';
 
   useEffect(() => {
@@ -116,3 +117,4 @@ MushroomCard.propTypes = {
   onSelect: PropTypes.func.isRequired
 };
 export default MushroomCard;
+

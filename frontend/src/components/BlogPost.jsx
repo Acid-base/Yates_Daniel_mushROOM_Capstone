@@ -1,16 +1,20 @@
 // src/components/BlogPost.jsx
 import React from 'react';
-
-function BlogPost({ post }) {
+import PropTypes from 'prop-types';
+const BlogPost = ({ title, content, date }) => {
   return (
-    <div>
-      <h2>{post.title}</h2>
-      <p>By: {post.author}</p>
-      <p>Date: {new Date(post.date).toLocaleDateString()}</p>
-      {post.imageUrl && <img src={post.imageUrl} alt={post.title} />}
-      <p>{post.content}</p>
-    </div>
+    <article className="blog-post">
+      <h2>{title}</h2>
+      <p className="post-date">{date}</p> 
+      <p>{content}</p>
+    </article>
   );
-}
+};
 
-export default BlogPost;
+BlogPost.propTypes = { 
+  title: PropTypes.string.isRequired, 
+  content: PropTypes.string.isRequired, 
+  date: PropTypes.string.isRequired, 
+};
+
+export default BlogPost; 

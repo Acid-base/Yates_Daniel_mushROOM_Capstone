@@ -1,5 +1,5 @@
 // backend/db/index.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 require('dotenv').config();
 
 const databaseUri = process.env.MONGODB_URI;
@@ -16,4 +16,5 @@ async function connectToDatabase() {
   }
 }
 
-module.exports = { connectToDatabase };
+export default { connectToDatabase };
+

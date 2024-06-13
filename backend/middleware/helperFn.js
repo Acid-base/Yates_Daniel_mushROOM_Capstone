@@ -1,6 +1,6 @@
 // backend/helpers.js
-const axios = require('axios');
-const rateLimit = require('axios-rate-limit');
+import axios from 'axios';
+import rateLimit from 'axios-rate-limit';
 
 // Rate limiting (adjust as needed)
 const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
@@ -13,7 +13,7 @@ async function getRegionFromCoordinates(latitude, longitude) {
 
 // Other helper functions (e.g., for data transformation)
 
-module.exports = {
+export default {
   getRegionFromCoordinates,
   // ... other helper functions
 };
