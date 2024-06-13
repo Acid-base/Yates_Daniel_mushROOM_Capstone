@@ -23,18 +23,24 @@ const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 })
 app.use(express.json());
 app.use(cors());
 
+const scientificNames = [
+  'Amanita muscaria',
+  'Boletus edulis',
+  'Cantharellus cibarius',
+  // Add more scientific names as needed
+];
 // MongoDB Connection
 mongoose.connect(databaseUri, {  })
   .then(() => {
     console.log('Connected to MongoDB');
 
-    // Example Usage (using imported function):
-    fetchAndStoreMushroomData("Amanita muscaria")
-      .then((savedMushroom) => {
-        console.log("Mushroom data saved successfully:", savedMushroom);
+    // Fetch and store mushroom data for the specified scientific names
+    fetchAndStoreMushroomData(scientificNames)
+      .then(() => {
+        console.log('Mushroom data fetching and storing completed.');
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error('Error:', error);
       });
   })
   .catch((error) => {
@@ -42,4 +48,3 @@ mongoose.connect(databaseUri, {  })
   });
 
 // ... (rest of server.js)
-///////
