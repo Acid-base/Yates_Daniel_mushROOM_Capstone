@@ -1,21 +1,16 @@
-// main.jsx - Entry point for the React application
-// Import the React library for using JSX.
+// src/main.jsx
 import React from 'react';
-// Import the ReactDOM library to render the React application into the DOM.
-import ReactDOM from 'react-dom/client'; 
-// Import the main App component from the App.jsx file.
-import App from './App.jsx';
-// Import the global CSS file.
-import './index.css';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter as Router } from 'react-router-dom';
+import App from './App';
+import { MushroomProvider } from './components/MushroomContext';
 
-// Get the root element from the DOM using its ID 'root'.
-// This is where the React application will be mounted.
-// Create a root using ReactDOM.createRoot.
-const root = ReactDOM.createRoot(document.getElementById('root'));
-// Render the App component wrapped in React.StrictMode to enable additional checks and warnings during development.
+const container = document.getElementById('root');
+const root = createRoot(container);
 root.render(
-  <React.StrictMode>
-    <App /> 
-  </React.StrictMode>
+  <MushroomProvider>
+    <Router>
+      <App />
+    </Router>
+  </MushroomProvider>
 );
-

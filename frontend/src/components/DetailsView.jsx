@@ -1,8 +1,8 @@
-// src/components/DetailsView.jsx 
+// src/components/DetailsView.jsx
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom'; 
-import ImageGallery from 'react-image-gallery'; // Import ImageGallery
-import MushroomContext from './MushroomContext'; 
+import { Link } from 'react-router-dom';
+import ImageGallery from 'react-image-gallery';
+import { MushroomContext } from './MushroomContext'; // Corrected import
 
 function DetailsView() {
   const { selectedMushroomId, mushrooms } = useContext(MushroomContext);
@@ -12,7 +12,7 @@ function DetailsView() {
     (mushroom) => mushroom.id === selectedMushroomId
   );
 
-  // If no mushroom is found, display a message 
+  // If no mushroom is found, display a message
   if (!selectedMushroom) {
     return <div>Select a mushroom to view details.</div>;
   }
@@ -25,7 +25,7 @@ function DetailsView() {
   return (
     <div>
       {/* Back button to the home page */}
-      <Link to="/">Back to Home</Link> 
+      <Link to="/">Back to Home</Link>
       <h2>{selectedMushroom.scientificName}</h2>
       {/* Image Gallery */}
       <ImageGallery items={images} />
@@ -39,4 +39,3 @@ function DetailsView() {
   );
 }
 export default DetailsView;
-

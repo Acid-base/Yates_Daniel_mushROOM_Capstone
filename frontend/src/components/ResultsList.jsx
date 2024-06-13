@@ -1,36 +1,27 @@
-// src/components/ResultsList.jsx - A React component to display a list of mushrooms
+// src/components/ResultsList.jsx
 import React from 'react';
-import PropTypes from 'prop-types'; // Import PropTypes
+import { useMushroomContext } from './MushroomContext'; // Adjust import path
 import MushroomCard from './MushroomCard';
 
-const ResultsList = ({ results, onMushroomSelect, loadMoreResults, hasMoreResults }) => (
-  <ul>
-    {results.map((mushroom) => (
-      <li key={mushroom.id} onClick={() => onMushroomSelect(mushroom)}>
-        <MushroomCard mushroom={mushroom} onSelect={() => onMushroomSelect(mushroom)} />
-      </li>
-    ))}
-    {hasMoreResults && (
-      <button onClick={loadMoreResults}>Load More</button>
-    )}
-  </ul>
-);
+const ResultsList = () => {
+  const { state, selectMushroom, loadMoreResults, hasMoreResults } = useMushroomContext();
+  const { mushrooms, loading } = state;
 
-ResultsList.propTypes = {
-  results: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      scientific_name: PropTypes.string.isRequired,
-      primary_image: PropTypes.shape({
-        medium_url: PropTypes.string,
-      }),
-      latitude: PropTypes.number,
-      longitude: PropTypes.number,
-    })
-  ).isRequired,
-  onMushroomSelect: PropTypes.func.isRequired,
-  loadMoreResults: PropTypes.func.isRequired,
-  hasMoreResults: PropTypes.bool.isRequired,
+  if (loading) {
+    return <div>Loading mushrooms...</div>;
+  }
+
+  return (
+    <ul>
+      {mushrooms.map((mushroom) => (
+        <li key={mushroom.id} onClick={() => selectMushroom(mushroom.id)}> 
+          <MushroomCard mushroom={mushroom} /> 
+        </li>
+      ))}
+      {hasMoreResults && (
+        <button onClick={loadMoreResults}>Load More</button>
+      )}
+    </ul>
+  );
 };
 export default ResultsList;

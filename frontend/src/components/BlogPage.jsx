@@ -1,29 +1,29 @@
 // src/components/BlogPage.jsx
 import React, { useState, useEffect } from 'react';
-import BlogPost from './BlogPost'; // Import BlogPost from its own file
+import BlogPost from './BlogPost';
 const BlogPage = () => {
-  const [posts, setPosts] = useState([]); 
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    // Fetch blog posts from an API or data source
-    fetch('https://api.example.com/posts')
+    fetch('https://your-api-base-url.com/posts') // Update with your actual API URL
       .then(res => res.json())
-      .then(data => setPosts(data));
+      .then(data => setPosts(data))
+      .catch(error => console.error('Error fetching posts:', error));
   }, []);
 
   return (
     <div>
       <h1>Blog</h1>
       {posts.map(post => (
-        <BlogPost 
-          key={post.id} 
-          title={post.title} 
-          content={post.content} 
-          date={post.date} // Assuming you have a 'date' field in your data
+        <BlogPost
+          key={post.id}
+          title={post.title}
+          content={post.content}
+          date={post.date}
         />
       ))}
     </div>
   );
 };
 
-export default BlogPage; 
+export default BlogPage;

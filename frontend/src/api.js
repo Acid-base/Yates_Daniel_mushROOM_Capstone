@@ -12,49 +12,17 @@ const handleRateLimit = async (apiUrl, retryCount, delay) => {
 
 // Function to fetch mushroom data
 export const fetchMushrooms = async (searchTerm = '', pageNumber = 1) => {
-  let retryCount = 0;
-  let delay = INITIAL_DELAY_MS; 
-
-  while (retryCount < MAX_RETRIES) {
-    try {
-      let apiUrl = `/api/mushrooms`;
-
-      if (searchTerm) {
-        apiUrl += `?name=${encodeURIComponent(searchTerm)}`;
-      }
-
-      if (pageNumber > 1) {
-        apiUrl += `&page=${pageNumber}`;
-      }
-
-      const response = await fetch(apiUrl);
-
-      // Check if the response is valid JSON (check response.ok)
-      if (response.ok) {
-      const data = await response.json();
-      return data;
-      } else {
-        // Handle non-JSON responses (including 429)
-        if (response.status === 429) {
-          // Handle rate limiting (you have this already)
-          const { retryCount: newRetryCount, delay: newDelay } = await handleRateLimit(apiUrl, retryCount, delay);
-          retryCount = newRetryCount;
-          delay = newDelay;
-          continue; 
-        } else {
-          // Throw a custom error for non-JSON responses
-          throw new Error(`API request failed with status: ${response.status}, Response not JSON`); 
-      }
+  try {
+    const response = await fetch(`https://your-api-base-url.com/mushrooms?q=${searchTerm}&page=${pageNumber}&size=20`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    const data = await response.json();
+    return data;
   } catch (error) {
-      console.error('Error fetching data:', error);
-    throw error; 
+    console.error('Error fetching data:', error);
+    throw error;
   }
-  }
-
-  // Throw an error if retries are exceeded
-  throw new Error('Maximum retries exceeded. Unable to fetch data.'); 
 };
 
 // Function to fetch details for a single mushroom by ID
