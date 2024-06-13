@@ -1,7 +1,8 @@
 // routes/blog.js
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const BlogPost = require('../models/BlogPostModel'); // Import BlogPost model
+import BlogPost from '../models/BlogPostModel'; // Import BlogPost model
+import mongoose from 'mongoose';
 
 router.get('/', async (req, res) => {
   try {
@@ -14,3 +15,4 @@ router.get('/', async (req, res) => {
 });
 
 // ... other blog routes
+export default router;

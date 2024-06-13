@@ -1,5 +1,5 @@
-// models/mushroom.js 
-const mongoose = require('mongoose');
+// mushroom.js 
+import mongoose from 'mongoose';
 
 const MushroomSchema = new mongoose.Schema({
   scientificName: { type: String, required: true, unique: true }, 
@@ -53,3 +53,4 @@ const MushroomSchema = new mongoose.Schema({
 const Mushroom = mongoose.model('Mushroom', MushroomSchema);
 
 module.exports = Mushroom; 
+

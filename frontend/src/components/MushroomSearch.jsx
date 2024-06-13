@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { MushroomContext } from '../MushroomContext';
-import SearchBar from './SearchBar';
-import ResultsList from './ResultsList';
+// src/components/MushroomSearch.jsx 
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Error from './Error';
+import { MushroomContext } from '../MushroomContext';
+import ResultsList from './ResultsList';
+import SearchBar from './SearchBar';
 
 function MushroomSearch() {
   const {
-    fetchMushroomsData,
+    fetchMushrooms, // Use the fetchMushrooms function from the context 
     mushrooms,
     error,
     loading,
@@ -22,14 +23,15 @@ function MushroomSearch() {
   const handleSearchChange = (newSearchTerm) => {
     setSearchQuery(newSearchTerm);
     setCurrentPage(1); // Reset page on new search
-    fetchMushroomsData(newSearchTerm, 1); 
+    fetchMushrooms(newSearchTerm, 1); 
   };
 
+  // Initial fetch
   useEffect(() => {
-    // Fetch initial data
-    fetchMushroomsData(searchQuery, currentPage);
-  }, [fetchMushroomsData, searchQuery, currentPage]); 
+    fetchMushrooms(searchQuery, currentPage);
+  }, [fetchMushrooms, searchQuery, currentPage]); 
 
+  // Load more when scrolling
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -42,12 +44,13 @@ function MushroomSearch() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []); // This is the new dependency array
+  }, []); 
 
+  // Load more data
   const loadMore = async () => {
     setIsLoading(true);
     setCurrentPage(currentPage + 1);
-    fetchMushroomsData(searchQuery, currentPage + 1);
+    fetchMushrooms(searchQuery, currentPage + 1);
   };
 
   return (
@@ -65,3 +68,4 @@ function MushroomSearch() {
 }
 
 export default MushroomSearch;
+
