@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router(); 
 const { body, validationResult } = require('express-validator');
-const Mushroom = require('../models/MushroomModel'); 
+const Mushroom = require('../../models/MushroomModel'); 
 
 router.post('/',
   [

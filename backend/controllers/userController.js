@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/UserModel');
-const Mushroom = require('../models/MushroomModel');
+const User = require('../../models/UserModel');
+const Mushroom = require('../../models/MushroomModel');
 // Register user
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;

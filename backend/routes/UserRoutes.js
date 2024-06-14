@@ -1,9 +1,10 @@
+// UserRoutes.js
 const express = require('express');
 const router = express.Router();
-const authenticateToken = require('../middleware/auth'); // Import middleware
+const authenticateToken = require('../../middleware/auth'); // Import middleware
 const userController = require('../controllers/userController');
-const Mushroom = require('../models/MushroomModel'); // Assuming you have a Mushroom model
-const User = require('../models/UserModel'); // Assuming you have a User model
+const Mushroom = require('../../models/MushroomModel'); // Assuming you have a Mushroom model
+const User = require('../../models/UserModel'); // Assuming you have a User model
 const { body, validationResult } = require('express-validator');
 
 // Protected route (requires authentication)
@@ -101,6 +102,8 @@ router.put('/:userId/update', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to update user' });
   }
 });
+
 router.post('/favorites/:mushroomId', authenticateToken, userController.toggleFavorite);
 
 module.exports = router;
+

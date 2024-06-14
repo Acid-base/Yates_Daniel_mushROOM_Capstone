@@ -1,6 +1,6 @@
 // controllers/blogController.js (or blogController.cjs)
 
-const BlogPost = require('../models/BlogPostModel'); // Updated import
+const BlogPost = require('../../models/BlogPostModel'); // Updated import
 
 // ... other imports
 

@@ -1,19 +1,21 @@
+// server.js
 const rateLimit = require('axios-rate-limit');
 const axios = require('axios');
 const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
-
 const cors = require('cors');
 const { body, validationResult } = require('express-validator');
+require('dotenv').config();
 
-const Mushroom = require('./models/MushroomModel');
-const mushroomsRouter = require('./routes/MushroomRoutes');
-const userRouter = require('./routes/UserRoutes');
+const db = require('./db'); // Import database module
+const userRoutes = require('./routes/UserRoutes');
+const mushroomRouter = require('./routes/MushroomRoutes');
 const blogRouter = require('./routes/BlogRoutes');
+const blogController = require('./controllers/blogController');
+const authenticateToken = require('./middleware/auth');
+const logger = require('./middleware/logger');
+
 const app = express();
 const port = process.env.PORT || 3001;
-const databaseUri = process.env.MONGODB_URI;
 
 // Rate limiting (adjust as needed)
 const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
@@ -32,106 +34,78 @@ retry(api, {
 });
 
 // Middleware
-app.use(express.json());
-app.use(cors());
+app.use(express.json()); // Parse JSON request bodies
+app.use(cors()); // Enable CORS for cross-origin requests
 
-// MongoDB Connection
-mongoose.connect(databaseUri, {  })
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
-  });
-
-// Function to fetch mushroom data
-async function fetchMushroomData(scientificName) {
-  try {
-    // 1. Fetch Name Data
-    const nameResponse = await api.get(
-      `https://mushroomobserver.org/api2/names?name=${scientificName}`
-    );
-    const nameData = nameResponse.data[0]; // Assuming the API returns an array of names
-
-    // 2. Fetch Observation Data (for images and details)
-    const observationResponse = await api.get(
-      `https://mushroomobserver.org/api2/observations?name=${scientificName}`
-    );
-    const observationData = observationResponse.data;
-
-    // 3. Combine Data from Different Endpoints
-    const mushroomData = {
-      scientificName: nameData.text_name,
-      latitude: nameData.latitude || null, // Use null if latitude is missing
-      longitude: nameData.longitude || null, // Use null if longitude is missing
-      imageUrl:
-        observationData.images && observationData.images.length > 0
-          ? observationData.images[0].url
-          : null, // Handle cases where no images are available
-      description: nameData.description,
-      commonName: nameData.common_name,
-      family: nameData.family,
-      genus: nameData.genus,
-      region: nameData.region || null, // Use null if region is missing
-    };
-
-    return mushroomData;
-  } catch (error) {
-    console.error("Error fetching mushroom data:", error.message);
-    throw error;
-  }
-}
-
-async function fetchAndSaveMushroom(scientificName) {
-  try {
-    const mushroomData = await fetchMushroomData(scientificName);
-    if (!mushroomData) {
-      return null;
-    }
-
-    const existingMushroom = await Mushroom.findOne({
-      scientificName: mushroomData.scientificName,
-    });
-
-    if (!existingMushroom) {
-      const newMushroom = new Mushroom(mushroomData);
-      await newMushroom.save();
-      return newMushroom;
-    } else {
-      return existingMushroom;
-    }
-  } catch (error) {
-    console.error(`Error fetching and saving mushroom with scientific name: ${scientificName}`, error.message);
-    throw error;
-  }
-}
-
-async function seedDatabase() {
-  try {
-    const scientificNames = ['Amanita muscaria', 'Boletus edulis', 'Cantharellus cibarius', 'Cortinarius caperatus', 'Lactarius deliciosus'];
-    
-    for (let scientificName of scientificNames) {
-      await fetchAndSaveMushroom(scientificName);
-    }
-
-    console.log(success);
-  } catch (error) {
-    console.error('Error seeding database:', error.message);
-  }
-}
-
-seedDatabase();
+// Authentication middleware
+app.use(authenticateToken);
 
 // Routes
-app.use('/mushrooms', mushroomsRouter);
-app.use('/users', userRouter);
+app.use('/users', userRoutes);
+app.use('/mushrooms', mushroomRouter);
 app.use('/blogs', blogRouter);
+
+// Function to fetch and store mushroom data
+async function fetchAndStoreMushroomData(observationId) {
+  const observationUrl = `https://mushroomobserver.org/api2/observations?id=${observationId}&detail=high&format=json`;
+
+  try {
+    const response = await api.get(observationUrl);
+    const data = response.data;
+
+    const observation = data.results[0];
+    const mushroomData = {
+      scientificName: observation.consensus_name,
+      latitude: observation.location.gps.latitude,
+      longitude: observation.location.gps.longitude,
+      imageUrl: observation.primary_image_url, // assuming this is included in high detail
+      description: observation.notes, // or observation.details
+      commonName: observation.name_common, // if available
+      family: observation.name_family,
+      genus: observation.name_genus,
+      region: observation.location.region,
+      kingdom: observation.name_kingdom,
+      phylum: observation.name_phylum,
+      class: observation.name_class,
+      order: observation.name_order,
+      habitat: observation.habitat, // if available
+      edibility: observation.edibility, // if available
+      distribution: observation.distribution, // if available
+      mushroomObserverUrl: `https://mushroomobserver.org/observations/${observation.id}`,
+      // other fields from observation data
+    };
+
+    // Save or update the mushroom document in MongoDB
+    const updatedMushroom = await Mushroom.findOneAndUpdate(
+      { scientificName: mushroomData.scientificName }, // query condition
+      mushroomData, // update data
+      { upsert: true, new: true } // options
+    );
+
+    logger.info('Mushroom data saved or updated successfully:', updatedMushroom);
+  } catch (error) {
+    logger.error('Error fetching or saving mushroom data:', error);
+  }
+}
+
+// Start the server
+app.listen(port, async () => {
+  try {
+    await db.connectToDatabase(); // Connect to the database
+    logger.info(`Mushroom Explorer backend listening at http://localhost:${port}`);
+
+    // Seed the database with initial data
+    await db.seedDatabase(); 
+
+    // Example: Fetch and store data for observation ID 12345
+    // await fetchAndStoreMushroomData(12345); 
+  } catch (error) {
+    logger.error('Error starting the server:', error);
+  }
+});
 
 // Error Handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something went wrong!');
+  logger.error(err.stack); // Log the error to the error file
+  res.status(500).json({ error: 'Something went wrong!' });
 });

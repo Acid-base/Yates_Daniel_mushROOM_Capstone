@@ -1,16 +1,16 @@
-// api.js
-const MAX_RETRIES = 5; // Maximum number of retries
-const INITIAL_DELAY_MS = 5000; // Initial delay in milliseconds
-const RATE_LIMIT_MS = 5000; // Rate limit delay in milliseconds
 
-// Helper function for handling rate limiting
+const MAX_RETRIES = 5; 
+const INITIAL_DELAY_MS = 5000;
+const RATE_LIMIT_MS = 5000;
+
+
 const handleRateLimit = async (apiUrl, retryCount, delay) => {
   console.warn(`Rate limit exceeded (attempt ${retryCount + 1}). Retrying in ${delay / 1000} seconds...`);
   await new Promise((resolve) => setTimeout(resolve, delay));
   return { retryCount: retryCount + 1, delay: delay * 2 }; 
 };
 
-// Function to fetch mushroom data
+
 export const fetchMushrooms = async (searchTerm = '', pageNumber = 1) => {
   try {
     const response = await fetch(`https://your-api-base-url.com/mushrooms?q=${searchTerm}&page=${pageNumber}&size=20`);
