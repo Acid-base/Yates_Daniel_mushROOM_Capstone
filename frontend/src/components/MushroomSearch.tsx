@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MushroomContext } from "../App"; // Assuming you have a MushroomContext
 import SearchBar from "./SearchBar";
 import ResultsList from "./ResultsList";
-import Error from "./Error"; // Assuming you have an Error component
+import Error from "./Error"; // Ensure this path is correct
 
 const MushroomSearch: React.FC = () => {
   const { selectMushroom } = useContext(MushroomContext);
@@ -73,4 +73,5 @@ const MushroomSearch: React.FC = () => {
     </div>
   );
 };
+
 export default MushroomSearch;

@@ -1,14 +1,20 @@
 // src/components/ProfilePage.tsx
-import React from "react";
-import { Route } from "react-router-dom";
-import PrivateRoute from "./PrivateRoute";
-
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchUserProfile } from '../api';
 const ProfilePage: React.FC = () => {
-  // Fetch user data and display it
+  const { isLoading, error, data: user } = useQuery('userProfile', fetchUserProfile);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
   return (
     <div>
       <h1>My Profile</h1>
-      {/* ... display user details */}
+      <p>Name: {user.name}</p>
+      <p>Email: {user.email}</p>
+      <p>Location: {user.location}</p>
+      <p>Bio: {user.bio}</p>
+      {/* Display other user details */}
     </div>
   );
 };

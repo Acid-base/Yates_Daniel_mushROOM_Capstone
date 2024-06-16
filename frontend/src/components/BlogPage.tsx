@@ -1,7 +1,7 @@
-// frontend/src/components/BlogPage.tsx
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import BlogPost from "./BlogPost";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchBlogPosts } from '../api';
+import BlogPost from './BlogPost';
 
 interface BlogPostProps {
   id: number;
@@ -10,15 +10,8 @@ interface BlogPostProps {
   date: string;
 }
 
-const BlogPage = () => {
-  const {
-    isLoading,
-    error,
-    data: posts,
-  } = useQuery<BlogPostProps[], Error>("posts", async () => {
-    const res = await fetch("https://your-api-base-url.com/posts"); // Update with your actual API URL
-    return res.json();
-  });
+const BlogPage: React.FC = () => {
+  const { isLoading, error, data: posts } = useQuery('blogPosts', fetchBlogPosts);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -26,13 +19,8 @@ const BlogPage = () => {
   return (
     <div>
       <h1>Blog</h1>
-      {posts.map((post) => (
-        <BlogPost
-          key={post.id}
-          title={post.title}
-          content={post.content}
-          date={post.date}
-        />
+      {posts.map((post: BlogPostProps) => (
+        <BlogPost key={post.id} title={post.title} content={post.content} date={post.date} />
       ))}
     </div>
   );

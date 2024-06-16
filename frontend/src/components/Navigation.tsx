@@ -1,8 +1,7 @@
-// src/components/Navigation.tsx
-import React, { useContext } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom"; // Import NavLink
-import { MushroomContext } from "./MushroomContext";
-import "./Navigation.css"; // Import CSS file
+import React, { useContext } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { MushroomContext } from './MushroomContext';
+import './Navigation.css';
 
 const Navigation: React.FC = () => {
   const { selectedMushroomId, clearSelection } = useContext(MushroomContext);
@@ -10,7 +9,7 @@ const Navigation: React.FC = () => {
 
   const handleClearSelection = () => {
     clearSelection();
-    navigate("/"); // Redirect to home after clearing selection
+    navigate('/');
   };
 
   return (
@@ -20,8 +19,7 @@ const Navigation: React.FC = () => {
           <NavLink to="/" end>
             Home
           </NavLink>
-        </li>{" "}
-        {/* Use NavLink with 'end' prop */}
+        </li>
         {selectedMushroomId && (
           <>
             <li>

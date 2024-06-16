@@ -1,4 +1,4 @@
-// MushroomCard.tsx
+// src/components/MushroomCard.tsx
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './MushroomCard.css';
@@ -10,7 +10,7 @@ interface MushroomCardProps {
   onSelect: (mushroomId: string) => void;
 }
 
-function MushroomCard({ mushroom, onSelect }: MushroomCardProps) {
+const MushroomCard: React.FC<MushroomCardProps> = ({ mushroom, onSelect }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const queryClient = useQueryClient();
@@ -65,14 +65,26 @@ function MushroomCard({ mushroom, onSelect }: MushroomCardProps) {
   };
 
   return (
-    <li
-      className="mushroom-card"
-      onMouseEnter={() => setShowDetails(true)}
-      onMouseLeave={() => setShowDetails(false)}
-    >
-      {/* ... (other content) ... */}
-      <button onClick={handleToggleFavorite} disabled={toggleFavoriteMutation.isLoading}>
-        {toggleFavoriteMutation.isLoading
-          ? 'Updating...'
-          : isFavorite
-          ? 'Remove
+    <div>
+      <ul>
+        <li
+          className="mushroom-card"
+          onMouseEnter={() => setShowDetails(true)}
+          onMouseLeave={() => setShowDetails(false)}
+        >
+          {/* ... (other content) ... */}
+          <button onClick={handleToggleFavorite} disabled={toggleFavoriteMutation.isLoading}>
+            {toggleFavoriteMutation.isLoading
+              ? 'Updating...'
+              : isFavorite
+              ? 'Remove from Favorites'
+              : 'Add to Favorites'}
+          </button>
+        </li>
+        {/* Other list items */}
+      </ul>
+    </div>
+  );
+};
+
+export default MushroomCard;

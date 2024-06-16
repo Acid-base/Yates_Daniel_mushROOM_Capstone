@@ -85,3 +85,16 @@ backend/mongo/CSV/observations(1).csv
 backend/mongo/mockSchema.js
 backend/mongo/scripts/localsave.js
 backend/mongo/scripts/localdatasetup.js
+.continuerc.json
+.continuerc.json
+.continuerc.json
+backend/.eslintrc.js
+backend/jest.config.js
+backend/jest.config.ts
+backend/jest.config.js
+backend/tsconfig.json
+backend/ts.ps1
+gpt.json
+.continuerc.json
+.continuerc.json
+backend/jest.config.js
