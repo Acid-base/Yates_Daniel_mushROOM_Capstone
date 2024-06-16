@@ -98,3 +98,5 @@ gpt.json
 .continuerc.json
 .continuerc.json
 backend/jest.config.js
+.continuerc.json
+backend/jest.config.js
