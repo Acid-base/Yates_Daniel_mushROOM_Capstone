@@ -1,6 +1,6 @@
 // controllers/mushroomController.js
-const Mushroom = require('../models/MushroomModel');
-const Favorite = require('../models/FavoriteModel'); // Assuming you created a Favorite model
+const Mushroom = require("../models/MushroomModel");
+const Favorite = require("../models/FavoriteModel"); // Assuming you created a Favorite model
 
 // Get Mushrooms
 const getMushrooms = async (req, res) => {
@@ -16,25 +16,25 @@ const toggleFavorite = async (req, res) => {
     // Check if mushroom exists
     const mushroom = await Mushroom.findById(mushroomId);
     if (!mushroom) {
-      return res.status(404).json({ error: 'Mushroom not found' });
+      return res.status(404).json({ error: "Mushroom not found" });
     }
 
     // Find existing favorite relationship
-    let favorite = await Favorite.findOne({ userId, mushroomId }); 
+    let favorite = await Favorite.findOne({ userId, mushroomId });
 
     if (favorite) {
       // Remove from favorites
       await favorite.deleteOne();
-      return res.json({ message: 'Removed from favorites' });
+      return res.json({ message: "Removed from favorites" });
     } else {
       // Add to favorites
       favorite = new Favorite({ userId, mushroomId });
       await favorite.save();
-      return res.json({ message: 'Added to favorites' });
+      return res.json({ message: "Added to favorites" });
     }
   } catch (error) {
-    console.error('Error toggling favorite:', error);
-    res.status(500).json({ error: 'Failed to toggle favorite' });
+    console.error("Error toggling favorite:", error);
+    res.status(500).json({ error: "Failed to toggle favorite" });
   }
 };
 

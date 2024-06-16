@@ -1,15 +1,15 @@
 // UserRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authenticateToken = require('../../middleware/auth'); // Import middleware
-const userController = require('../controllers/userController');
-const Mushroom = require('../../models/MushroomModel'); // Assuming you have a Mushroom model
-const User = require('../../models/UserModel'); // Assuming you have a User model
-const { body, validationResult } = require('express-validator');
+const authenticateToken = require("../../middleware/auth"); // Import middleware
+const userController = require("../controllers/userController");
+const Mushroom = require("../../models/MushroomModel"); // Assuming you have a Mushroom model
+const User = require("../../models/UserModel"); // Assuming you have a User model
+const { body, validationResult } = require("express-validator");
 
 // Protected route (requires authentication)
-router.get('/', authenticateToken, async (req, res) => {
-  const searchTerm = req.query.q || '';
+router.get("/", authenticateToken, async (req, res) => {
+  const searchTerm = req.query.q || "";
   const page = parseInt(req.query.page) || 1;
   const userId = req.userId; // Get the user ID from the authenticated request
 
@@ -19,9 +19,9 @@ router.get('/', authenticateToken, async (req, res) => {
     if (searchTerm) {
       query = {
         $or: [
-          { commonName: { $regex: searchTerm, $options: 'i' } },
-          { scientificName: { $regex: searchTerm, $options: 'i' } }
-        ]
+          { commonName: { $regex: searchTerm, $options: "i" } },
+          { scientificName: { $regex: searchTerm, $options: "i" } },
+        ],
       };
     }
 
@@ -36,14 +36,12 @@ router.get('/', authenticateToken, async (req, res) => {
         .skip(skip)
         .limit(pageSize)
         .populate({
-          path: 'favorites',
+          path: "favorites",
           match: { userId: userId }, // Only populate favorites for the current user
-          select: 'favoritedAt' // Optional: Select only the favoritedAt field
+          select: "favoritedAt", // Optional: Select only the favoritedAt field
         });
     } else {
-      mushrooms = await Mushroom.find(query)
-        .skip(skip)
-        .limit(pageSize);
+      mushrooms = await Mushroom.find(query).skip(skip).limit(pageSize);
     }
 
     const totalMushrooms = await Mushroom.countDocuments(query);
@@ -53,33 +51,32 @@ router.get('/', authenticateToken, async (req, res) => {
       currentPage: page,
       totalPages: Math.ceil(totalMushrooms / pageSize),
     });
-
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({ error: 'Error fetching data' });
+    res.status(500).json({ error: "Error fetching data" });
   }
 });
 
 // New route for fetching user details
-router.get('/me', authenticateToken, async (req, res) => {
+router.get("/me", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
-      .select('-password') // Exclude password from response
-      .populate('favorites', '-userId') // Populate favorites for the user
-      .populate('savedMushrooms', '-userId'); // Populate saved mushrooms for the user (if applicable)
+      .select("-password") // Exclude password from response
+      .populate("favorites", "-userId") // Populate favorites for the user
+      .populate("savedMushrooms", "-userId"); // Populate saved mushrooms for the user (if applicable)
 
     res.json(user);
   } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Failed to fetch user' });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Failed to fetch user" });
   }
 });
 
-router.post('/register', userController.registerUser); // Register route
-router.post('/login', userController.loginUser); // Login route
+router.post("/register", userController.registerUser); // Register route
+router.post("/login", userController.loginUser); // Login route
 
 // Add other routes for creating, updating, deleting users
-router.put('/:userId/update', authenticateToken, async (req, res) => {
+router.put("/:userId/update", authenticateToken, async (req, res) => {
   try {
     // Validate the request body (add validation for required fields)
     const errors = validationResult(req);
@@ -89,21 +86,27 @@ router.put('/:userId/update', authenticateToken, async (req, res) => {
 
     const userId = req.params.userId;
     if (userId !== req.userId) {
-      return res.status(401).json({ error: 'Unauthorized to update this profile' });
+      return res
+        .status(401)
+        .json({ error: "Unauthorized to update this profile" });
     }
 
     // Update the user's profile information
-    const updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true })
-      .select('-password'); // Exclude password from response
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+      new: true,
+    }).select("-password"); // Exclude password from response
 
     res.json(updatedUser);
   } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ error: 'Failed to update user' });
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Failed to update user" });
   }
 });
 
-router.post('/favorites/:mushroomId', authenticateToken, userController.toggleFavorite);
+router.post(
+  "/favorites/:mushroomId",
+  authenticateToken,
+  userController.toggleFavorite,
+);
 
 module.exports = router;
-

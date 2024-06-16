@@ -1,4 +1,3 @@
-
 ## Installation
 
 1. Install Node.js and npm (or your preferred package manager).

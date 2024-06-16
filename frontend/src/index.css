@@ -1,98 +1,68 @@
 :root {
-  font-family: 'Roboto', sans-serif; /* Modern and readable */
-  line-height: 1.6; /* Improved readability */
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
   font-weight: 400;
+
   color-scheme: light dark;
-  color: #212529; /* Dark gray for text */
-  background-color: #F5F5F5; /* Off-white background */
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 a {
-  color: #5D8A3E; /* Primary green for links */
-  text-decoration: none;
-  transition: color 0.2s ease;
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
 }
 a:hover {
-  color: #A67C52; /* Accent orange on hover */
+  color: #535bf2;
 }
 
 body {
   margin: 0;
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
 h1 {
-  font-size: 2.5rem;
-  color: #5D8A3E; /* Primary green for main headings */
-  margin-bottom: 1rem;
+  font-size: 3.2em;
+  line-height: 1.1;
 }
 
-h2 {
-  font-size: 2rem;
-  color: #A67C52; /* Accent orange for subheadings */
-  margin-bottom: 0.75rem;
-}
-
-p {
-  margin-bottom: 1rem;
-}
 button {
-  background-color: #5D8A3E; /* Primary green button */
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 5px;
-  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: border-color 0.25s;
 }
-
 button:hover {
-  background-color: #4A7531; /* Darker green on hover */
+  border-color: #646cff;
 }
-
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-main {
-  padding: 2rem;
-  flex-grow: 1; /* Main content takes up available space */
-}
-
-footer {
-  background-color: #D9B88C; /* Secondary tan for footer */
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    color: #F5F5F5; /* Off-white text in dark mode */
-    background-color: #212529; /* Dark gray background */
+    color: #213547;
+    background-color: #ffffff;
   }
-
-  a {
-    color: #D9B88C; /* Secondary tan for links */
-  }
-
   a:hover {
-    color: #A67C52; /* Accent orange on hover */
+    color: #747bff;
   }
-
   button {
-    background-color: #D9B88C; /* Secondary tan button */
-  }
-
-  button:hover {
-    background-color: #B89D72; /* Darker tan on hover */
-  }
-
-  footer {
-    background-color: #343A40; /* Darker gray for footer */
+    background-color: #f9f9f9;
   }
 }

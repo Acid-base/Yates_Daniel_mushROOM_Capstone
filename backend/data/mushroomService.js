@@ -1,24 +1,24 @@
-const axios = require('axios');
-const rateLimit = require('axios-rate-limit'); // Assuming you're using 'axios-rate-limit'
-const express = require('express');
-const mongoose = require('mongoose');
-const { APIError, DatabaseError } = require('../../middleware/customErrors.js');
-const Mushroom = require('../../models/MushroomModel.js');
-const User = require('../../models/UserModel.js');
-const BlogPost = require('../../models/BlogPostModel.js');
+const axios = require("axios");
+const rateLimit = require("axios-rate-limit"); // Assuming you're using 'axios-rate-limit'
+const express = require("express");
+const mongoose = require("mongoose");
+const { APIError, DatabaseError } = require("../../middleware/customErrors.js");
+const Mushroom = require("../../models/MushroomModel.js");
+const User = require("../../models/UserModel.js");
+const BlogPost = require("../../models/BlogPostModel.js");
 
-const logger = require('../../middleware/logger.js');
-const authenticateToken = require('../../middleware/auth.js');
-const userRoutes = require('../routes/UserRoutes');
-const mushroomRouter = require('../routes/MushroomRoutes');
-const blogRouter = require('../routes/BlogRoutes');
-const blogController = require('../controllers/blogController');
-const db = require('./db');
+const logger = require("../../middleware/logger.js");
+const authenticateToken = require("../../middleware/auth.js");
+const userRoutes = require("../routes/UserRoutes");
+const mushroomRouter = require("../routes/MushroomRoutes");
+const blogRouter = require("../routes/BlogRoutes");
+const blogController = require("../controllers/blogController");
+const db = require("./db");
 
-require('dotenv').config();
+require("dotenv").config();
 
-const cors = require('cors');
-const { body, validationResult } = require('express-validator');
+const cors = require("cors");
+const { body, validationResult } = require("express-validator");
 
 const app = express();
 const port = 3008;
@@ -28,15 +28,18 @@ app.use(express.json()); // Parse JSON request bodies
 app.use(cors()); // Enable CORS for cross-origin requests
 
 // Rate Limiting (using axios-rate-limit)
-const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
+const api = rateLimit(axios.create(), {
+  maxRequests: 1,
+  perMilliseconds: 6000,
+});
 
 // Authentication middleware
 app.use(authenticateToken);
 
 // Routes
-app.use('/users', userRoutes);
-app.use('/mushrooms', mushroomRouter);
-app.use('/blogs', blogRouter);
+app.use("/users", userRoutes);
+app.use("/mushrooms", mushroomRouter);
+app.use("/blogs", blogRouter);
 
 // Function to fetch and store mushroom data
 async function fetchAndStoreMushroomData(observationId) {
@@ -72,12 +75,15 @@ async function fetchAndStoreMushroomData(observationId) {
     const updatedMushroom = await Mushroom.findOneAndUpdate(
       { scientificName: mushroomData.scientificName }, // query condition
       mushroomData, // update data
-      { upsert: true, new: true } // options
+      { upsert: true, new: true }, // options
     );
 
-    console.log('Mushroom data saved or updated successfully:', updatedMushroom);
+    console.log(
+      "Mushroom data saved or updated successfully:",
+      updatedMushroom,
+    );
   } catch (error) {
-    console.error('Error fetching or saving mushroom data:', error);
+    console.error("Error fetching or saving mushroom data:", error);
   }
 }
 
@@ -85,11 +91,13 @@ async function fetchAndStoreMushroomData(observationId) {
 app.listen(port, async () => {
   try {
     await db.connectToDatabase();
-    console.log(`Mushroom Explorer backend listening at http://localhost:${port}`);
+    console.log(
+      `Mushroom Explorer backend listening at http://localhost:${port}`,
+    );
 
     // Example: Fetch and store data for observation ID 12345
-    await fetchAndStoreMushroomData(12345); 
+    await fetchAndStoreMushroomData(12345);
   } catch (error) {
-    console.error('Error starting the server:', error);
+    console.error("Error starting the server:", error);
   }
 });
