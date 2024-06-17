@@ -1,0 +1,31 @@
+/* Navigation.css */
+nav {
+  background-color: #f0f0f0; /* Light gray background */
+  padding: 1rem;
+  text-align: center; /* Center the links */
+}
+
+nav ul {
+  list-style: none; /* Remove bullet points */
+  margin: 0;
+  padding: 0;
+}
+
+nav li {
+  display: inline-block; /* Display links horizontally */
+  margin: 0 1rem; /* Add spacing between links */
+}
+
+nav a {
+  text-decoration: none; /* Remove underlines from links */
+  color: #333; /* Dark gray link color */
+  font-weight: bold;
+}
+
+nav button {
+  background-color: transparent; /* Make button blend in */
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer; /* Indicate it's clickable */
+}

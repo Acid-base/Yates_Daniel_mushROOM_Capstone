@@ -1,4 +1,3 @@
-// src/mushroomReducer.js 
 const initialState = { selectedMushroomId: null };
 
 const mushroomReducer = (state = initialState, action) => {
