@@ -1,9 +1,7 @@
-// backend/src/models/Post.ts
-
 import mongoose, { Model, Schema, Document } from 'mongoose';
 
 // Define the Post interface to ensure type safety and consistency
-interface IPost extends Document {
+interface IBlogPost extends Document {
   title: string;
   content: string;
   author: string;
@@ -12,7 +10,7 @@ interface IPost extends Document {
 }
 
 // Define the Post schema
-const PostSchema: Schema = new Schema({
+const BlogPostSchema: Schema = new Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
   author: { type: String, required: true },
@@ -20,13 +18,7 @@ const PostSchema: Schema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-// Pre-save hook to automatically update timestamps
-PostSchema.pre('save', function (next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
 // Create the Post model
-const Post: Model<IPost> = mongoose.model<IPost>('Post', PostSchema);
+const BlogPostModel: Model<IBlogPost> = mongoose.model<IBlogPost>('BlogPost', BlogPostSchema);
 
-export default Post;
+export default BlogPostModel;
