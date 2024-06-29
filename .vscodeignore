@@ -1,0 +1,91 @@
+# Exclude node_modules directories
+node_modules
+
+# Exclude build outputs
+**/dist
+**/build
+**/out
+
+# Exclude test results
+results
+.nyc_output
+
+# Exclude TypeScript build info files
+*.tsbuildinfo
+
+# Exclude Nx cache and workspace data
+.nx/cache
+.nx/workspace-data
+
+# Exclude logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Exclude OS generated files
+.DS_Store
+Thumbs.db
+
+# Exclude IDE specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Exclude environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Exclude coverage directory used by tools like istanbul
+coverage
+
+# Exclude temporary files
+tmp/
+temp/
+
+# Exclude lock files (if you want to commit only one type of lock file)
+# Uncomment the lines below if you want to ignore specific lock files.
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Exclude specific directories in your workspace
+apps/**/node_modules
+packages/**/node_modules
+frontend/node_modules
+
+# Exclude specific build artifacts in your workspace
+apps/**/dist
+packages/**/dist
+frontend/dist
+
+# Exclude specific IDE configurations in your workspace
+apps/**/.vscode/
+packages/**/.vscode/
+frontend/.vscode/
+
+# Exclude specific temporary files in your workspace
+apps/**/tmp/
+packages/**/tmp/
+frontend/tmp/
+
+# Exclude specific coverage directories in your workspace
+apps/**/coverage/
+packages/**/coverage/
+frontend/coverage/
+
+# Additional exclusions for VS Code extensions
+.vscode-test/
+.vscode-test-web/
+.vscode-test-resources/
+.vscode-test-scripts/
+test/
+tests/

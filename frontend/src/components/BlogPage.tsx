@@ -11,7 +11,11 @@ interface BlogPostProps {
 }
 
 const BlogPage: React.FC = () => {
-  const { isLoading, error, data: posts } = useQuery('blogPosts', fetchBlogPosts);
+  const {
+    isLoading,
+    error,
+    data: posts,
+  } = useQuery('blogPosts', fetchBlogPosts);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -20,7 +24,12 @@ const BlogPage: React.FC = () => {
     <div>
       <h1>Blog</h1>
       {posts.map((post: BlogPostProps) => (
-        <BlogPost key={post.id} title={post.title} content={post.content} date={post.date} />
+        <BlogPost
+          key={post.id}
+          title={post.title}
+          content={post.content}
+          date={post.date}
+        />
       ))}
     </div>
   );

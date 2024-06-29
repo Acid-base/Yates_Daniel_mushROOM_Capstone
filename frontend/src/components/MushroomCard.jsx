@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'; // Import PropTypes
-import './MushroomCard.css'; 
+import './MushroomCard.css';
 
 function MushroomCard({ mushroom, onSelect }) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const [region, setRegion] = useState('Unknown'); 
+  const [region, setRegion] = useState('Unknown');
   const [showDetails, setShowDetails] = useState(false); // Add state for details card visibility
-  const imageUrl = mushroom.primary_image?.medium_url || 'placeholder-image.jpg';
+  const imageUrl =
+    mushroom.primary_image?.medium_url || 'placeholder-image.jpg';
 
   useEffect(() => {
     // Check if the mushroom is in the user's favorites in local storage
@@ -33,13 +34,15 @@ function MushroomCard({ mushroom, onSelect }) {
 
   const handleFavoriteToggle = () => {
     setIsFavorite(!isFavorite);
-    updateFavoritesInLocalStorage(mushroom.id, !isFavorite); 
+    updateFavoritesInLocalStorage(mushroom.id, !isFavorite);
   };
 
   // Function to fetch region data from Nominatim
   async function fetchRegionFromNominatim(latitude, longitude) {
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+      );
       const data = await response.json();
       return data.display_name || null; // Assuming the display_name is the region
     } catch (error) {
@@ -79,22 +82,27 @@ function MushroomCard({ mushroom, onSelect }) {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }
   return (
-    <li 
-      className="mushroom-card" 
+    <li
+      className="mushroom-card"
       onMouseEnter={() => setShowDetails(true)}
       onMouseLeave={() => setShowDetails(false)}
       onClick={() => onSelect(mushroom.id)} // Call onSelect with the mushroom ID
     >
-      <img src={imageUrl} alt={mushroom.name} /> 
+      <img src={imageUrl} alt={mushroom.name} />
       <h3>{mushroom.name}</h3>
       <button onClick={handleFavoriteToggle}>
         {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
       </button>
 
-      {showDetails && ( 
-        <div className="details-card"> 
-          <p><strong>Scientific Name:</strong> {mushroom.scientific_name}</p>
-          <p><strong>Region:</strong> {region}</p> {/* Display the fetched region */}
+      {showDetails && (
+        <div className="details-card">
+          <p>
+            <strong>Scientific Name:</strong> {mushroom.scientific_name}
+          </p>
+          <p>
+            <strong>Region:</strong> {region}
+          </p>{' '}
+          {/* Display the fetched region */}
           {/* ... other details can be added here */}
         </div>
       )}
@@ -109,12 +117,11 @@ MushroomCard.propTypes = {
     name: PropTypes.string.isRequired,
     scientific_name: PropTypes.string.isRequired,
     primary_image: PropTypes.shape({
-      medium_url: PropTypes.string
+      medium_url: PropTypes.string,
     }),
     latitude: PropTypes.number, // Assuming latitude and longitude are numbers
-    longitude: PropTypes.number
+    longitude: PropTypes.number,
   }).isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 export default MushroomCard;
-

@@ -1,6 +1,6 @@
 // BlogPost.tsx
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
 interface BlogPostProps {
   title: string;

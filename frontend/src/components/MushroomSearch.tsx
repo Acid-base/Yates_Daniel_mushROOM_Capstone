@@ -1,14 +1,14 @@
 // frontend/src/components/MushroomSearch.tsx
-import React, { useState, useRef, useContext } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { MushroomContext } from "../App"; // Assuming you have a MushroomContext
-import SearchBar from "./SearchBar";
-import ResultsList from "./ResultsList";
-import Error from "./Error"; // Ensure this path is correct
+import React, { useState, useRef, useContext } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { MushroomContext } from '../App'; // Assuming you have a MushroomContext
+import SearchBar from './SearchBar';
+import ResultsList from './ResultsList';
+import Error from './Error'; // Ensure this path is correct
 
 const MushroomSearch: React.FC = () => {
   const { selectMushroom } = useContext(MushroomContext);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const listBottomRef = useRef(null);
 
@@ -18,13 +18,13 @@ const MushroomSearch: React.FC = () => {
     data: mushrooms,
     fetchNextPage,
   } = useQuery({
-    queryKey: ["mushrooms", searchQuery, currentPage],
+    queryKey: ['mushrooms', searchQuery, currentPage],
     queryFn: async () => {
       const res = await fetch(
-        `https://api.example.com/mushrooms?q=${searchQuery}&page=${currentPage}&size=20`,
+        `https://api.example.com/mushrooms?q=${searchQuery}&page=${currentPage}&size=20`
       );
       if (!res.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
       return res.json();
     },
@@ -55,8 +55,8 @@ const MushroomSearch: React.FC = () => {
         loadMore();
       }
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [isLoading, loadMore]);
 
   return (

@@ -1,0 +1,14 @@
+Create a React component called `MyComponent` that displays a list of items passed in as props. The component should have the following features:
+
+- **Props:**
+    - `items`: An array of objects, each object containing a `title` and `description` property.
+- **Functionality:**
+    - The component should render a list of items, each item displaying the `title` and `description` from the corresponding object.
+- **Styling:**
+    - The component should have a basic styling, with each item having a distinct border and padding.
+- **Accessibility:**
+    - The component should be accessible, with appropriate ARIA attributes and semantic HTML elements.
+
+**Output:**
+
+Provide the React component code in a well-formatted JavaScript file.

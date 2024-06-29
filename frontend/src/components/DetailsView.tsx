@@ -15,9 +15,12 @@ const DetailsView: React.FC = () => {
   const { id } = useParams();
   const mushroomId = parseInt(id!, 10);
 
-  const { isLoading, error, data: mushroom } = useQuery<Mushroom, Error>(
-    ['mushroom', mushroomId],
-    () => fetchMushroomDetails(mushroomId)
+  const {
+    isLoading,
+    error,
+    data: mushroom,
+  } = useQuery<Mushroom, Error>(['mushroom', mushroomId], () =>
+    fetchMushroomDetails(mushroomId)
   );
 
   if (isLoading) return <p>Loading details...</p>;
@@ -27,10 +30,12 @@ const DetailsView: React.FC = () => {
   return (
     <div>
       <h1>{mushroom.scientificName}</h1>
-      <ImageGallery items={mushroom.images.map(image => ({
-        original: image.url,
-        thumbnail: image.thumbnail_url,
-      }))} />
+      <ImageGallery
+        items={mushroom.images.map(image => ({
+          original: image.url,
+          thumbnail: image.thumbnail_url,
+        }))}
+      />
       {/* Render other mushroom details */}
     </div>
   );

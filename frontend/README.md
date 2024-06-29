@@ -98,3 +98,4 @@ This project is licensed under the MIT License.
 7. **Contributing and License**: Added sections for contributing and license information.
 
 By including these details, the `README.md` file provides a comprehensive overview of the frontend application, its routes, and the TypeScript interfaces used.
+```

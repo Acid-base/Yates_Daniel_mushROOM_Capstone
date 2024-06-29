@@ -4,7 +4,10 @@ interface PrivateRouteProps {
   isAuthenticated: boolean;
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated, children }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({
+  isAuthenticated,
+  children,
+}) => {
   const location = useLocation();
 
   return isAuthenticated ? (

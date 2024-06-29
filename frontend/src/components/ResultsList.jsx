@@ -3,16 +3,22 @@ import React from 'react';
 import PropTypes from 'prop-types'; // Import PropTypes
 import MushroomCard from './MushroomCard';
 
-const ResultsList = ({ results, onMushroomSelect, loadMoreResults, hasMoreResults }) => (
+const ResultsList = ({
+  results,
+  onMushroomSelect,
+  loadMoreResults,
+  hasMoreResults,
+}) => (
   <ul>
-    {results.map((mushroom) => (
+    {results.map(mushroom => (
       <li key={mushroom.id} onClick={() => onMushroomSelect(mushroom)}>
-        <MushroomCard mushroom={mushroom} onSelect={() => onMushroomSelect(mushroom)} />
+        <MushroomCard
+          mushroom={mushroom}
+          onSelect={() => onMushroomSelect(mushroom)}
+        />
       </li>
     ))}
-    {hasMoreResults && (
-      <button onClick={loadMoreResults}>Load More</button>
-    )}
+    {hasMoreResults && <button onClick={loadMoreResults}>Load More</button>}
   </ul>
 );
 

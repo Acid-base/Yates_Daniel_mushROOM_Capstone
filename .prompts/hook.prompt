@@ -1,0 +1,16 @@
+Create a React hook called `useCounter` that provides the following functionality:
+
+- **State:**
+    - `count`: An integer representing the current count, initialized to 0.
+- **Functions:**
+    - `increment()`: Increments the `count` by 1.
+    - `decrement()`: Decrements the `count` by 1.
+    - `reset()`: Resets the `count` to 0.
+
+**Output:**
+
+Provide the React hook code in a well-formatted JavaScript file. Ensure the code follows best practices for React hooks, including:
+
+- Using the `useState` hook to manage the `count` state.
+- Returning an object containing the `count` state and the `increment`, `decrement`, and `reset` functions.
+- Providing clear and concise documentation for the hook.

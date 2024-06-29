@@ -10,7 +10,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   const loginMutation = useMutation(loginUser, {
-    onSuccess: (data) => {
+    onSuccess: data => {
       const token = data.token;
       localStorage.setItem('token', token);
       navigate('/');
@@ -38,13 +38,13 @@ const LoginPage: React.FC = () => {
         <input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           placeholder="Email"
         />
         <input
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           placeholder="Password"
         />
         <button type="submit">Login</button>

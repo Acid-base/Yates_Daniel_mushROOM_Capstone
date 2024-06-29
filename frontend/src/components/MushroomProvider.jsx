@@ -47,18 +47,18 @@ const MushroomProvider = ({ children }) => {
 
   useEffect(() => {
     fetchMushroomsData();
-  }, []); 
+  }, []);
 
   const clearSelection = () => {
     dispatch({ type: 'CLEAR_SELECTION' });
   };
 
-  const setSelectedMushroom = (mushroomId) => {
+  const setSelectedMushroom = mushroomId => {
     dispatch({ type: 'SET_SELECTED_MUSHROOM', payload: mushroomId });
   };
 
   // Add setAuthenticated function for handling authentication
-  const setAuthenticated = (isAuthenticated) => {
+  const setAuthenticated = isAuthenticated => {
     dispatch({ type: 'SET_AUTHENTICATED', payload: isAuthenticated });
   };
 
@@ -69,8 +69,8 @@ const MushroomProvider = ({ children }) => {
     isAuthenticated: state.isAuthenticated, // Make isAuthenticated accessible
     fetchMushroomsData, // Pass fetchMushroomsData to context
     clearSelection,
-    setSelectedMushroom, 
-    setAuthenticated // Make setAuthenticated accessible
+    setSelectedMushroom,
+    setAuthenticated, // Make setAuthenticated accessible
   };
 
   return (

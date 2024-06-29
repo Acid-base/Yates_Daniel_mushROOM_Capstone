@@ -30,10 +30,10 @@ export const fetchMushrooms = async (searchTerm, pageNumber = 1) => {
         // Log a warning message indicating that the rate limit has been exceeded.
         console.warn('Rate limit exceeded. Retrying in 5 seconds...');
         // Wait for the specified RATE_LIMIT_MS (5 seconds) using a promise and setTimeout.
-        await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_MS));
+        await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_MS));
         // Recursively call the fetchMushrooms function to retry the request after the delay.
         return await fetchMushrooms(searchTerm, pageNumber);
-      // If it's not a rate limiting error, throw a generic error message.
+        // If it's not a rate limiting error, throw a generic error message.
       } else {
         throw new Error('Something went wrong with the API request!');
       }
@@ -51,4 +51,3 @@ export const fetchMushrooms = async (searchTerm, pageNumber = 1) => {
     throw error;
   }
 };
-

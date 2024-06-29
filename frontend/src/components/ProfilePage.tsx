@@ -3,7 +3,11 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserProfile } from '../api';
 const ProfilePage: React.FC = () => {
-  const { isLoading, error, data: user } = useQuery('userProfile', fetchUserProfile);
+  const {
+    isLoading,
+    error,
+    data: user,
+  } = useQuery('userProfile', fetchUserProfile);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;

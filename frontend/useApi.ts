@@ -1,5 +1,5 @@
 // frontend/src/hooks/useApi.ts (example)
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 export const useApi = <T>(apiUrl: string) => {
   const [data, setData] = useState<T | null>(null);

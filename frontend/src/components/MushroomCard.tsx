@@ -44,7 +44,7 @@ const MushroomCard: React.FC<MushroomCardProps> = ({ mushroom, onSelect }) => {
         queryClient.invalidateQueries(['mushrooms']);
         updateFavorites(mushroom.id);
       },
-      onError: (error) => {
+      onError: error => {
         console.error('Error toggling favorite:', error);
         // Handle errors (e.g., display an error message)
       },
@@ -73,12 +73,15 @@ const MushroomCard: React.FC<MushroomCardProps> = ({ mushroom, onSelect }) => {
           onMouseLeave={() => setShowDetails(false)}
         >
           {/* ... (other content) ... */}
-          <button onClick={handleToggleFavorite} disabled={toggleFavoriteMutation.isLoading}>
+          <button
+            onClick={handleToggleFavorite}
+            disabled={toggleFavoriteMutation.isLoading}
+          >
             {toggleFavoriteMutation.isLoading
               ? 'Updating...'
               : isFavorite
-              ? 'Remove from Favorites'
-              : 'Add to Favorites'}
+                ? 'Remove from Favorites'
+                : 'Add to Favorites'}
           </button>
         </li>
         {/* Other list items */}

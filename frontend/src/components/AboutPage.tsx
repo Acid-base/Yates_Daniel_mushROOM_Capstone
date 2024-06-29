@@ -1,7 +1,7 @@
 // AboutPage.tsx (Refactored with useMutation)
-import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import React, { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 
 interface ContactFormValues {
   name: string;
@@ -10,15 +10,15 @@ interface ContactFormValues {
 }
 
 function AboutPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   const contactMutation = useMutation(
     async (data: ContactFormValues) => {
-      const response = await axios.post("/api/contact", data);
+      const response = await axios.post('/api/contact', data);
       return response.data;
     },
     {
@@ -26,12 +26,12 @@ function AboutPage() {
         setSubmitted(true);
       },
       onError: (error: any) => {
-        console.error("Error submitting form:", error);
+        console.error('Error submitting form:', error);
         setSubmissionError(
-          error.message || "An error occurred during submission.",
+          error.message || 'An error occurred during submission.'
         );
       },
-    },
+    }
   );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -55,7 +55,7 @@ function AboutPage() {
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
             />
           </div>
           <div>
@@ -64,7 +64,7 @@ function AboutPage() {
               type="email"
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
             />
           </div>
           <div>
@@ -72,14 +72,14 @@ function AboutPage() {
             <textarea
               id="message"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={e => setMessage(e.target.value)}
             />
           </div>
           {submissionError && (
             <div className="error-message">{submissionError}</div>
           )}
           <button type="submit" disabled={contactMutation.isLoading}>
-            {contactMutation.isLoading ? "Submitting..." : "Submit"}
+            {contactMutation.isLoading ? 'Submitting...' : 'Submit'}
           </button>
         </form>
       )}
