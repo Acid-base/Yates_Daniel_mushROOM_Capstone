@@ -6,7 +6,11 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "test", "lint"]
+        "cacheableOperations": [
+          "build",
+          "test",
+          "lint"
+        ]
       }
     }
   },
@@ -15,6 +19,9 @@
     "libsDir": "packages"
   },
   "release": {
-    "projects": ["packages/*"]
-  }
+    "projects": [
+      "packages/*"
+    ]
+  },
+  "nxCloudAccessToken": "OTM1MTNhMzQtZjlmOC00ZjU4LWJlZGItMTBlZmRjNGNmMGJjfHJlYWQtd3JpdGU="
 }
