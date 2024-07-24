@@ -1,116 +1,110 @@
-const rateLimit = require('axios-rate-limit');
-const axios = require('axios');
-const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config(); 
-
-const cors = require('cors');
-const { body, validationResult } = require('express-validator');
-
-const Mushroom = require('./models/MushroomModel');
-const mushroomsRouter = require('./routes/MushroomRoutes'); 
-const userRouter = require('./routes/UserRoutes');
-const blogRouter = require('./routes/BlogRoutes');
-
-// ... (other requires)
+import express from 'express';
+import mongoose from './mongo/db';
+import apiLimiter from './middleware/rateLimiter';
+import observationsRouter from './routes/observations';
+import namesRouter from './routes/names';
+import searchRouter from './routes/search';
+import { storeObservations, storeImages, storeNames } from './utils/dataStorage';
+import mapObservation from './utils/dataMapper';
+import { fetchObservationImages, fetchObservationDetails, fetchMushroomNames } from './utils/apiRequests';
 
 const app = express();
-const port = process.env.PORT || 3001;
-const databaseUri = process.env.MONGODB_URI
-
-// Rate limiting (adjust as needed)
-const api = rateLimit(axios.create(), { maxRequests: 1, perMilliseconds: 6000 });
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(apiLimiter);
 
-// MongoDB Connection
-mongoose.connect(databaseUri, {  })
-  .then(() => {
-    console.log('Connected to MongoDB');
+// Routes
+app.use('/api/observations', observationsRouter);
+app.use('/api/names', namesRouter);
+app.use('/api/search', searchRouter);
 
-    // *** Initial Data Fetch Example *** 
+// Start your server 
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
-    // Function to fetch mushroom data
-    async function fetchMushroomData(scientificName) {
-      try {
-        // 1. Fetch Name Data
-        const nameResponse = await axios.get(
-          `https://mushroomobserver.org/api2/names?name=${scientificName}`
-        );
-        const nameData = nameResponse.data[0]; // Assuming the API returns an array of names
+// --- Data Fetching and Storage Logic ---
 
-        // 2. Fetch Observation Data (for images and details)
-        const observationResponse = await axios.get(
-          `https://mushroomobserver.org/api2/observations?name=${scientificName}`
-        );
-        const observationData = observationResponse.data;
+async function fetchAndStorePage(currentPage) {
+  try {
+    const observationsData = await fetchObservationDetails(currentPage);
 
-        // 3. Combine Data from Different Endpoints
-        const mushroomData = {
-          scientificName: nameData.text_name,
-          latitude: nameData.latitude || null, // Use null if latitude is missing
-          longitude: nameData.longitude || null, // Use null if longitude is missing
-          imageUrl:
-            observationData.images && observationData.images.length > 0
-              ? observationData.images[0].url
-              : null, // Handle cases where no images are available
-          description: nameData.description,
-          commonName: nameData.common_name,
-          family: nameData.family,
-          genus: nameData.genus,
-          region: nameData.region || null, // Use null if region is missing
-          gallery: observationData.images
-            ? observationData.images.map((image) => ({
-                url: image.url,
-                thumbnailUrl: image.thumbnail_url || null, // Use null if thumbnail is missing
-              }))
-            : [], // Return an empty array if no images are found
-          kingdom: nameData.kingdom,
-          phylum: nameData.phylum,
-          class: nameData.class,
-          order: nameData.order,
-          habitat: nameData.habitat,
-          edibility: nameData.edibility, // Assuming the API provides edibility information
-          distribution: nameData.distribution,
-          wikipediaUrl: nameData.wikipedia_url,
-          mushroomObserverUrl: `https://mushroomobserver.org/name/${nameData.id}`,
-        };
+    console.log(`API Response (Page ${currentPage}):`);
+    console.dir(observationsData, { depth: null });
 
-        return mushroomData;
-      } catch (error) {
-        console.error(`Error fetching data for ${scientificName}:`, error);
-        throw error;
-      }
+    // Check for API errors FIRST
+    if (observationsData && observationsData.error) {
+      console.error(`API Error (Page ${currentPage}):`, observationsData.error);
+      return false; // Stop fetching if there's an API error
     }
 
-    // Example Usage:
-    fetchMushroomData("Amanita muscaria")
-      .then((mushroomData) => {
-        // Create a new Mushroom document with the fetched data
-        const mushroom = new Mushroom(mushroomData);
-        // Save the document to MongoDB
-        return mushroom.save();
-      })
-      .then((savedMushroom) => {
-        console.log("Mushroom data saved successfully:", savedMushroom);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error); 
-  });
+    // THEN, check if results are present
+    if (observationsData && Array.isArray(observationsData.results) && observationsData.results.length > 0) {
+      try {
+        const observations = observationsData.results.map(mapObservation).filter(obs => obs !== null);
+        await storeObservations(observations);
 
+        const imagePromises = observations.map(obs => fetchObservationImages(obs.id).then(images => storeImages(images.results)));
+        await Promise.all(imagePromises);
 
-// Register routes
-app.use('/api/mushrooms', mushroomsRouter);
-app.use('/users', userRouter); 
-app.use('/api/blog', blogRouter); 
+        return true; // Continue fetching if successful
+      } catch (mappingError) {
+        console.error(`Error mapping observations (Page ${currentPage}):`, mappingError);
+        return false; // Stop fetching if there's a mapping error
+      }
+    } else { // Only print "No more observations..." if there's no error AND no results
+      console.log(`No more observations found after page ${currentPage - 1}.`);
+      return false; // Stop fetching if no more results
+    }
 
-// Start the Server 
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
-});
+  } catch (fetchError) {
+    console.error(`Error fetching data for page ${currentPage}:`, fetchError);
+    return true; // CONTINUE FETCHING even if there's a fetch error (likely temporary)
+  }
+}
+
+async function continuousFetch() {
+  let currentPage = 1;
+
+  while (await fetchAndStorePage(currentPage)) {
+    currentPage++;
+    await new Promise(resolve => setTimeout(resolve, 5000)); 
+  }
+
+  setInterval(async () => {
+    if (await fetchAndStorePage(currentPage)) {
+      currentPage++;
+    }
+  }, 3600000); 
+}
+
+let initialDataFetched = false; 
+
+async function fetchInitialData() {
+  if (initialDataFetched) {
+    console.log("Initial data already fetched. Skipping.");
+    return;
+  }
+
+  let currentPage = 1;
+  const maxPages = 10; // Adjust as needed
+
+  while (currentPage <= maxPages && await fetchAndStorePage(currentPage)) {
+    currentPage++;
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
+
+  // Fetch and store names 
+  const namesData = await fetchMushroomNames();
+  if (namesData && namesData.results && namesData.results.length > 0) { 
+    await storeNames(namesData.results);
+  }
+
+  initialDataFetched = true;
+}
+
+// Start continuous fetching
+continuousFetch();
+
+// Fetch initial data on startup
+fetchInitialData();
