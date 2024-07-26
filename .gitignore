@@ -155,3 +155,6 @@ backend/data/observations.csv
 ~/.nvm/nvm-exec
 ~/.nvm/nvm.sh
 .vscodeignore
+backend/observation_images.json
+backend/~/.nvm/nvm-exec
+backend/~/.nvm/nvm.sh
