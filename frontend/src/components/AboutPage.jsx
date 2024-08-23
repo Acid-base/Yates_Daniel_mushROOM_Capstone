@@ -4,9 +4,9 @@ function AboutPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false); 
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     event.preventDefault();
 
     // Send the form data to your backend endpoint
@@ -46,7 +46,7 @@ function AboutPage() {
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
             />
           </div>
           <div>
@@ -55,7 +55,7 @@ function AboutPage() {
               type="email"
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
             />
           </div>
           <div>
@@ -63,7 +63,7 @@ function AboutPage() {
             <textarea
               id="message"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={e => setMessage(e.target.value)}
             />
           </div>
           <button type="submit">Submit</button>
@@ -74,4 +74,3 @@ function AboutPage() {
 }
 
 export default AboutPage;
-

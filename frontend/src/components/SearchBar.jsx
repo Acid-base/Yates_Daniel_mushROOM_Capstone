@@ -35,7 +35,7 @@ const SearchBar = () => {
 
     try {
       const response = await fetch(
-        `https://api.example.com/mushrooms?q=${searchTerm}&page=${currentPage}&size=${PAGE_SIZE}` 
+        `https://api.example.com/mushrooms?q=${searchTerm}&page=${currentPage}&size=${PAGE_SIZE}`
         // Replace 'https://api.example.com/mushrooms' with your actual API endpoint
       );
 
@@ -64,14 +64,14 @@ const SearchBar = () => {
     }
   }, [searchTerm, fetchMushrooms]);
 
-  const handleInputChange = (event) => {
+  const handleInputChange = event => {
     setSearchTerm(event.target.value);
   };
 
   const handleScroll = useCallback(() => {
     if (
       window.innerHeight + document.documentElement.scrollTop >=
-      document.documentElement.scrollHeight - 100 
+      document.documentElement.scrollHeight - 100
       // 100 is a buffer for when the scroll reaches the bottom
     ) {
       fetchMushrooms();

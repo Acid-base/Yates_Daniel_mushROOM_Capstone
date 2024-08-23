@@ -1,7 +1,7 @@
 // src/components/ProfilePage.jsx
 import React from 'react';
 import { Route } from 'react-router-dom';
-import PrivateRoute from './PrivateRoute'; 
+import PrivateRoute from './PrivateRoute';
 function ProfilePage() {
   // Fetch user data and display it
   return (
@@ -14,5 +14,11 @@ function ProfilePage() {
 
 export default ProfilePage;
 
-
-<Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+<Route
+  path="/profile"
+  element={
+    <PrivateRoute>
+      <ProfilePage />
+    </PrivateRoute>
+  }
+/>;

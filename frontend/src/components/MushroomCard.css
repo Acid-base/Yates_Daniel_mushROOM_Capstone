@@ -1,9 +1,9 @@
 /* MushroomCard.css */
 .mushroom-card {
   /* Set the position to relative to allow absolute positioning for the details card. */
-  position: relative; 
+  position: relative;
   /* Add margin at the bottom for spacing between cards. */
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 }
 
 /* Style the details card. */
@@ -11,29 +11,30 @@
   /* Position the details card absolutely within the mushroom card. */
   position: absolute;
   /* Position it at the bottom-left corner of the mushroom card. */
-  bottom: 0; 
-  left: 0; 
+  bottom: 0;
+  left: 0;
   /* Make it take up the full width of the mushroom card. */
   width: 100%;
   /* Set a semi-transparent white background. */
-  background-color: rgba(255, 255, 255, 0.9); 
+  background-color: rgba(255, 255, 255, 0.9);
   /* Add padding for content spacing. */
   padding: 10px;
   /* Round the corners of the details card. */
   border-radius: 5px;
   /* Initially translate the card vertically by 100% to hide it below the mushroom card. */
-  transform: translateY(100%); 
+  transform: translateY(100%);
   /* Set initial opacity to 0 to make it invisible. */
-  opacity: 0; 
+  opacity: 0;
   /* Add a smooth transition effect for transform and opacity. */
-  transition: transform 0.3s ease, opacity 0.3s ease; 
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* When hovering over the mushroom card, show the details card. */
 .mushroom-card:hover .details-card {
   /* Translate the card vertically to its original position (0). */
-  transform: translateY(0); 
+  transform: translateY(0);
   /* Set the opacity to 1 to make it fully visible. */
-  opacity: 1; 
-} 
-
+  opacity: 1;
+}

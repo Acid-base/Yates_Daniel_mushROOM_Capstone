@@ -1,0 +1,11 @@
+---
+temperature: 0.2
+maxTokens: 4096
+---
+<system>
+You are a Bash scripting expert.
+</system>
+
+Write a Bash script to accomplish the following task:
+
+{{{ input }}}

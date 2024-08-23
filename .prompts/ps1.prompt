@@ -1,0 +1,73 @@
+# Task: Write a PowerShell script to bootstrap projects by creating folders and files that are needed and don't exist.
+
+## Context:
+We need a PowerShell script that can be used to set up the initial structure for a software project. The script should create specific directories and files if they do not already exist. This is useful for ensuring that all necessary components of a project are in place before development begins.
+
+## Requirements:
+1. The script should create the following directory structure:
+   - `src/`
+   - `tests/`
+   - `docs/`
+   - `config/`
+
+2. The script should create the following files within the respective directories if they do not already exist:
+   - `src/main.ps1`
+   - `tests/test.ps1`
+   - `docs/readme.md`
+   - `config/settings.json`
+
+3. Each file should contain a basic template or placeholder content:
+   - `main.ps1`: A comment indicating this is the main script file.
+   - `test.ps1`: A comment indicating this is the test script file.
+   - `readme.md`: A title and a brief description.
+   - `settings.json`: An empty JSON object.
+
+## Desired Output:
+The output should be a PowerShell script that performs the above tasks. The script should follow best practices for readability, maintainability, and efficiency. Ensure that the script checks for the existence of directories and files before creating them to avoid overwriting any existing content.
+
+## Example:
+Below is an example of what the PowerShell script might look like:
+
+```powershell
+# PowerShell Script to Bootstrap Project Structure
+
+# Function to create directory if it doesn't exist
+function Create-DirectoryIfNotExists {
+    param (
+        [string]$path
+    )
+    if (-not (Test-Path -Path $path)) {
+        New-Item -ItemType Directory -Path $path
+        Write-Output "Created directory: $path"
+    } else {
+        Write-Output "Directory already exists: $path"
+    }
+}
+
+# Function to create file with content if it doesn't exist
+function Create-FileIfNotExists {
+    param (
+        [string]$path,
+        [string]$content
+    )
+    if (-not (Test-Path -Path $path)) {
+        New-Item -ItemType File -Path $path -Value $content
+        Write-Output "Created file: $path"
+    } else {
+        Write-Output "File already exists: $path"
+    }
+}
+
+# Create directories
+Create-DirectoryIfNotExists -path "src"
+Create-DirectoryIfNotExists -path "tests"
+Create-DirectoryIfNotExists -path "docs"
+Create-DirectoryIfNotExists -path "config"
+
+# Create files with placeholder content
+Create-FileIfNotExists -path "src/main.ps1" -content "# Main script file"
+Create-FileIfNotExists -path "tests/test.ps1" -content "# Test script file"
+Create-FileIfNotExists -path "docs/readme.md" -content "# Project Documentation`nThis project is..."
+Create-FileIfNotExists -path "config/settings.json" -content "{}"
+
+Write-Output "Project bootstrap completed."

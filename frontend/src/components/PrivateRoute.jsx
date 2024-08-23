@@ -7,8 +7,11 @@ function PrivateRoute() {
   const { isAuthenticated } = useContext(MushroomContext); // Access authentication state
   const location = useLocation();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 }
 
 export default PrivateRoute;
-
