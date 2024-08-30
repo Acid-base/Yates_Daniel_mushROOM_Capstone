@@ -21,11 +21,13 @@ public/
 # Testing
 coverage/
 *.coverage*
-
+.continueignore
 # IDE specific files
 .DS_Store
 .idea
 .vscode
+.pnpm-store
+.venv
 
 # Temporary files
 *.tmp
@@ -1234,4 +1236,4 @@ pip-log.txt
 *.sln
 *.suo
 *.user
-
+prompt

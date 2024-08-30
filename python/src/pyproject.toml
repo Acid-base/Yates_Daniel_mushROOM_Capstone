@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pipeline"
+version = "0.1.0"
+description = "datapipe for mushroom observer CSV handling"
+authors = ["Daniel Yates <145247690+Acid-base@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+requests = "^2.32.3"
+pymongo = "^4.8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
