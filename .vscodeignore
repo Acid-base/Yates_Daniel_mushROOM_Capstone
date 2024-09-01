@@ -55,7 +55,7 @@ temp/
 # Uncomment the lines below if you want to ignore specific lock files.
 # package-lock.json
 # yarn.lock
-# pnpm-lock.yaml
+
 
 # Exclude specific directories in your workspace
 apps/**/node_modules

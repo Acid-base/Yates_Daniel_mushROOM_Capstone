@@ -154,7 +154,6 @@ README.md
 *.sh
 *.bat
 *.ps1
-*.py
 *.js
 *.css
 *.html

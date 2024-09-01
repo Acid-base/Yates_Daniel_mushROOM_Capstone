@@ -1,5 +1,5 @@
 packages:
-  - 'backend/*'
-  - 'frontend/*'
-  - 'mobile/*'
-  - 'python/*'
+  - 'backend'
+  - 'frontend'
+  - 'mobile'
+  - 'python'
