@@ -1,19 +1,28 @@
 [tool.poetry]
 name = "src"
 version = "0.1.0"
-description = ""
-authors = ["Daniel Yates <145247690+Acid-base@users.noreply.github.com>"]
+description = "A brief description of your project."
+authors = ["Your Name <you@example.com>"]
 license = "MIT"
 readme = "README.md"
-package-mode = false
+package-mode = true  # Set to true if you're building a package
+
 [tool.poetry.dependencies]
 python = "^3.12"
-pymongo = "^4.8.0"
 pandas = "^2.2.2"
-logging = "^0.4.9.6"
-typing = "^3.1"
-numpy = "^2.1.0"
+numpy = "^2.1.1"
+pymongo = "^4.8.0"
+bson = "^0.5.10"
+jsonschema = "^4.23.0"
+requests = "^2.32.3"
+pyyaml = "^6.0.2"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.11.2"
+black = "^24.8.0"
+flake8 = "^7.1.1"
+ruff = "^0.6.9"  # Specify the latest version of ruff
 
 [build-system]
 requires = ["poetry-core"]

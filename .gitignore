@@ -157,6 +157,7 @@ README.md
 *.js
 *.css
 *.html
+.env
 *.xml
 *.json
 *.csv
