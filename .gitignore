@@ -1236,3 +1236,4 @@ pip-log.txt
 *.suo
 *.user
 prompt
+.trunk/trunk.yaml

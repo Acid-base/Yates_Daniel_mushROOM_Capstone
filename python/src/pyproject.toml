@@ -1,29 +1,44 @@
 [tool.poetry]
-name = "src"
+name = "mushroom-data-processing"
 version = "0.1.0"
-description = "A brief description of your project."
-authors = ["Your Name <you@example.com>"]
-license = "MIT"
-readme = "README.md"
-package-mode = true  # Set to true if you're building a package
+description = "Data processing pipeline for mushroom observations"
+authors = ["Your Name <your.email@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
-pandas = "^2.2.2"
-numpy = "^2.1.1"
-pymongo = "^4.8.0"
-bson = "^0.5.10"
-jsonschema = "^4.23.0"
-requests = "^2.32.3"
-pyyaml = "^6.0.2"
+python = ">=3.9,<4.0"
+pandas = "^2.0.0"
+python-dotenv = "^1.0.0"
+pymongo = "^4.5.0"
+pyyaml = "^6.0.1"
+pydantic = "^2.6.1"
+pydantic-csv = "^0.1.0"
+pydantic-settings = "^2.1.0"
+pytest = "^8.3.3"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-mypy = "^1.11.2"
-black = "^24.8.0"
-flake8 = "^7.1.1"
-ruff = "^0.6.9"  # Specify the latest version of ruff
+pytest = ">=8.2.2,<9.0.0"
+ruff = "^0.2.1"
+mypy = "^1.8.0"
+pytest-cov = "^4.1.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # import-order
+    "N",  # naming
+    "C",  # complexity
+    "D",  # duplicate
+    "R",  # refactoring
+    "T",  # type-checking
+    "A",  # astroid
+    "O",  # ordering
+    "M",  # misc
+]
