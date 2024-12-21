@@ -9,11 +9,13 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 @dataclass
 class PerformanceMetrics:
     """Container for performance metrics."""
+
     function_name: str
     start_time: datetime
     end_time: datetime
@@ -21,15 +23,17 @@ class PerformanceMetrics:
     success: bool
     error: Exception | None = None
 
+
 def measure_performance(func: Callable[..., T]) -> Callable[..., T]:
     """Decorator to measure function performance."""
+
     @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> T:
         start_time = datetime.now()
         start = time.perf_counter()
         error = None
         success = True
-        
+
         try:
             result = func(*args, **kwargs)
             return result
@@ -40,19 +44,20 @@ def measure_performance(func: Callable[..., T]) -> Callable[..., T]:
         finally:
             end_time = datetime.now()
             duration = time.perf_counter() - start
-            
+
             metrics = PerformanceMetrics(
                 function_name=func.__name__,
                 start_time=start_time,
                 end_time=end_time,
                 duration=timedelta(seconds=duration),
                 success=success,
-                error=error
+                error=error,
             )
-            
+
             log_performance_metrics(metrics)
-    
+
     return cast(Callable[..., T], wrapper)
+
 
 def log_performance_metrics(metrics: PerformanceMetrics) -> None:
     """Log performance metrics."""
@@ -63,8 +68,6 @@ def log_performance_metrics(metrics: PerformanceMetrics) -> None:
         f"Started: {metrics.start_time.isoformat()} - "
         f"Ended: {metrics.end_time.isoformat()}"
     )
-    
+
     if not metrics.success and metrics.error:
-        logger.error(
-            f"{metrics.function_name} failed with error: {str(metrics.error)}"
-        ) 
+        logger.error(f"{metrics.function_name} failed with error: {str(metrics.error)}")

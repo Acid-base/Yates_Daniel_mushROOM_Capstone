@@ -2,14 +2,26 @@ from datetime import datetime
 from typing import Dict, List, Any
 import pytest
 from ..data_csv import (
-    safe_cast, clean_text, parse_date, process_names,
-    validate_taxonomy, BoundingBox, ImageMetadata, License,
-    determine_location_type, parse_location_hierarchy,
-    DataConfig, process_images, process_image_observations,
-    process_location_descriptions, process_locations,
-    process_name_classifications, process_name_descriptions,
-    process_observations
+    safe_cast,
+    clean_text,
+    parse_date,
+    process_names,
+    validate_taxonomy,
+    BoundingBox,
+    ImageMetadata,
+    License,
+    determine_location_type,
+    parse_location_hierarchy,
+    DataConfig,
+    process_images,
+    process_image_observations,
+    process_location_descriptions,
+    process_locations,
+    process_name_classifications,
+    process_name_descriptions,
+    process_observations,
 )
+
 
 # Fixtures
 @pytest.fixture
@@ -21,7 +33,7 @@ def sample_names() -> List[Dict[str, Any]]:
             "author": "Author 1",
             "deprecated": "0",
             "correct_spelling_id": "",
-            "rank": "1"
+            "rank": "1",
         },
         {
             "id": "2",
@@ -29,9 +41,10 @@ def sample_names() -> List[Dict[str, Any]]:
             "author": "Author 2",
             "deprecated": "1",
             "correct_spelling_id": "1",
-            "rank": "1"
-        }
+            "rank": "1",
+        },
     ]
+
 
 @pytest.fixture
 def sample_taxonomy() -> Dict[str, str]:
@@ -41,39 +54,52 @@ def sample_taxonomy() -> Dict[str, str]:
         "phylum": "Ascomycota",
         "class": "Lecanoromycetes",
         "order": "Lecanorales",
-        "family": "Parmeliaceae"
+        "family": "Parmeliaceae",
     }
 
+
 # Test utility functions
-@pytest.mark.parametrize("input_value, type_cast, expected", [
-    ("123", int, 123),
-    ("12.34", float, 12.34),
-    ("NULL", int, None),
-    ("", float, None),
-    ("invalid", int, "invalid"),
-    ("invalid", float, None),
-])
+@pytest.mark.parametrize(
+    "input_value, type_cast, expected",
+    [
+        ("123", int, 123),
+        ("12.34", float, 12.34),
+        ("NULL", int, None),
+        ("", float, None),
+        ("invalid", int, "invalid"),
+        ("invalid", float, None),
+    ],
+)
 def test_safe_cast(input_value, type_cast, expected):
     assert safe_cast(input_value, type_cast) == expected
 
-@pytest.mark.parametrize("input_text, expected", [
-    ("<p>Test</p>", "Test"),
-    ('"Link":http://example.com', "Link (http://example.com)"),
-    ("  Test  \n\n  Text  ", "Test  \n  Text"),
-    ("NULL", None),
-    (None, None),
-])
+
+@pytest.mark.parametrize(
+    "input_text, expected",
+    [
+        ("<p>Test</p>", "Test"),
+        ('"Link":http://example.com', "Link (http://example.com)"),
+        ("  Test  \n\n  Text  ", "Test  \n  Text"),
+        ("NULL", None),
+        (None, None),
+    ],
+)
 def test_clean_text(input_text, expected):
     assert clean_text(input_text) == expected
 
-@pytest.mark.parametrize("date_string, expected", [
-    ("2023-01-01", datetime(2023, 1, 1)),
-    ("invalid", None),
-    ("", None),
-    (None, None),
-])
+
+@pytest.mark.parametrize(
+    "date_string, expected",
+    [
+        ("2023-01-01", datetime(2023, 1, 1)),
+        ("invalid", None),
+        ("", None),
+        (None, None),
+    ],
+)
 def test_parse_date(date_string, expected):
     assert parse_date(date_string) == expected
+
 
 def test_process_names(sample_names):
     result = process_names(sample_names)
@@ -93,18 +119,25 @@ def test_process_names(sample_names):
     assert result[2]["correct_spelling_id"] == 1
     assert len(result[2]["misspellings"]) == 0
 
-@pytest.mark.parametrize("taxonomy_data, expected_error", [
-    ({}, "Missing required taxonomic ranks"),
-    ({"domain": "Eukarya"}, "Missing required taxonomic ranks"),
-    ({
-        "domain": "Eukarya",
-        "kingdom": "Fungi",
-        "phylum": "Ascomycota",
-        "class": "Lecanoromycetes",
-        "order": "Lecanorales",
-        "family": "Parmeliaceae"
-    }, None)
-])
+
+@pytest.mark.parametrize(
+    "taxonomy_data, expected_error",
+    [
+        ({}, "Missing required taxonomic ranks"),
+        ({"domain": "Eukarya"}, "Missing required taxonomic ranks"),
+        (
+            {
+                "domain": "Eukarya",
+                "kingdom": "Fungi",
+                "phylum": "Ascomycota",
+                "class": "Lecanoromycetes",
+                "order": "Lecanorales",
+                "family": "Parmeliaceae",
+            },
+            None,
+        ),
+    ],
+)
 def test_validate_taxonomy(taxonomy_data, expected_error):
     errors = validate_taxonomy(taxonomy_data)
     if expected_error:
@@ -112,20 +145,17 @@ def test_validate_taxonomy(taxonomy_data, expected_error):
     else:
         assert not errors
 
+
 # Test dataclass functionality
 def test_bounding_box():
     bbox = BoundingBox(
-        north=45.0,
-        south=44.0,
-        east=-122.0,
-        west=-123.0,
-        high=1000.0,
-        low=0.0
+        north=45.0, south=44.0, east=-122.0, west=-123.0, high=1000.0, low=0.0
     )
 
     assert bbox.center == (44.5, -122.5)
     assert bbox.dimensions == (1.0, 1.0)
     assert bbox.elevation_range == (0.0, 1000.0)
+
 
 def test_image_metadata():
     metadata = ImageMetadata(
@@ -138,13 +168,8 @@ def test_image_metadata():
         notes="Test notes",
         width=800,
         height=600,
-        crop=BoundingBox(
-            north=45.0,
-            south=44.0,
-            east=-122.0,
-            west=-123.0
-        ),
-        observation_id=123
+        crop=BoundingBox(north=45.0, south=44.0, east=-122.0, west=-123.0),
+        observation_id=123,
     )
 
     # Test that the object was created successfully
@@ -163,16 +188,21 @@ def test_image_metadata():
     assert metadata.crop.east == -122.0
     assert metadata.crop.west == -123.0
 
+
 # Test location processing
-@pytest.mark.parametrize("name,expected_type", [
-    ("Yellowstone National Park, USA", "park"),
-    ("Willamette National Forest, Oregon", "forest"),
-    ("Lane Co., Oregon", "county"),
-    ("Portland, Oregon, USA", "city"),
-    ("Random Place", "unknown")
-])
+@pytest.mark.parametrize(
+    "name,expected_type",
+    [
+        ("Yellowstone National Park, USA", "park"),
+        ("Willamette National Forest, Oregon", "forest"),
+        ("Lane Co., Oregon", "county"),
+        ("Portland, Oregon, USA", "city"),
+        ("Random Place", "unknown"),
+    ],
+)
 def test_determine_location_type(name: str, expected_type: str):
     assert determine_location_type(name) == expected_type
+
 
 def test_parse_location_hierarchy():
     location = "Mount Hood, Clackamas Co., Oregon, USA"
@@ -183,12 +213,14 @@ def test_parse_location_hierarchy():
     assert hierarchy["state"] == "Oregon"
     assert hierarchy["country"] == "USA"
 
+
 # Test configuration
 def test_data_config():
     assert DataConfig.DEFAULT_DELIMITER == "\t"
     assert DataConfig.BATCH_SIZE == 1000
     assert DataConfig.DATE_FORMAT == "%Y-%m-%d"
     assert "NULL" in DataConfig.NULL_VALUES
+
 
 # Integration tests
 def test_process_names_integration(sample_names):
@@ -201,6 +233,7 @@ def test_process_names_integration(sample_names):
     assert all("synonyms" in data for data in processed.values())
     assert all("misspellings" in data for data in processed.values())
 
+
 def test_process_image_observations():
     # Test data based on the first few rows of images_observations.csv
     test_data = [
@@ -208,11 +241,17 @@ def test_process_image_observations():
         {"image_id": "2", "observation_id": "2"},
         {"image_id": "3", "observation_id": "3"},
         {"image_id": "9", "observation_id": "9"},
-        {"image_id": "10", "observation_id": "9"},  # Multiple images for one observation
+        {
+            "image_id": "10",
+            "observation_id": "9",
+        },  # Multiple images for one observation
         {"image_id": "21", "observation_id": "18"},
         {"image_id": "22", "observation_id": "18"},
         {"image_id": "23", "observation_id": "18"},
-        {"image_id": "24", "observation_id": "18"},  # Multiple images for one observation
+        {
+            "image_id": "24",
+            "observation_id": "18",
+        },  # Multiple images for one observation
     ]
 
     result = process_image_observations(test_data)
@@ -224,7 +263,12 @@ def test_process_image_observations():
 
     # Test multiple images for one observation
     assert result[9] == [9, 10]  # Observation 9 has images 9 and 10
-    assert result[18] == [21, 22, 23, 24]  # Observation 18 has images 21, 22, 23, and 24
+    assert result[18] == [
+        21,
+        22,
+        23,
+        24,
+    ]  # Observation 18 has images 21, 22, 23, and 24
 
     # Test non-existent observation
     assert 100 not in result  # Observation 100 doesn't exist
@@ -232,8 +276,13 @@ def test_process_image_observations():
     # Test result structure
     assert isinstance(result, dict)
     assert all(isinstance(k, int) for k in result.keys())  # All keys should be integers
-    assert all(isinstance(v, list) for v in result.values())  # All values should be lists
-    assert all(isinstance(i, int) for v in result.values() for i in v)  # All image IDs should be integers
+    assert all(
+        isinstance(v, list) for v in result.values()
+    )  # All values should be lists
+    assert all(
+        isinstance(i, int) for v in result.values() for i in v
+    )  # All image IDs should be integers
+
 
 def test_process_images():
     # Sample test data based on images.csv
@@ -244,7 +293,7 @@ def test_process_images():
             "copyright_holder": "Nathan Wilson",
             "license": "Creative Commons Wikipedia Compatible v3.0",
             "ok_for_export": "1",
-            "diagnostic": "1"
+            "diagnostic": "1",
         },
         {
             "id": "2",
@@ -252,7 +301,7 @@ def test_process_images():
             "copyright_holder": "Nathan Wilson",
             "license": "Creative Commons Wikipedia Compatible v3.0",
             "ok_for_export": "1",
-            "diagnostic": "1"
+            "diagnostic": "1",
         },
         {
             "id": "3",
@@ -260,15 +309,15 @@ def test_process_images():
             "copyright_holder": "Nathan Wilson",
             "license": "Creative Commons Wikipedia Compatible v3.0",
             "ok_for_export": "1",
-            "diagnostic": "1"
-        }
+            "diagnostic": "1",
+        },
     ]
 
     # Sample image-observation mapping
     image_obs_mapping = {
         1: [1],
         2: [2],
-        3: [3, 4]  # One image linked to multiple observations
+        3: [3, 4],  # One image linked to multiple observations
     }
 
     result = process_images(test_images, image_obs_mapping)
@@ -297,8 +346,15 @@ def test_process_images():
         assert isinstance(img_data["observations"], list)
 
     # Test that all required fields are present
-    required_fields = {"_id", "content_type", "copyright_holder", "license",
-                      "ok_for_export", "diagnostic", "observations"}
+    required_fields = {
+        "_id",
+        "content_type",
+        "copyright_holder",
+        "license",
+        "ok_for_export",
+        "diagnostic",
+        "observations",
+    }
     for img_data in result.values():
         assert all(field in img_data for field in required_fields)
 
@@ -307,6 +363,7 @@ def test_process_images():
 
     # Test that all images from input are processed
     assert len(result) == len(test_images)
+
 
 def test_process_location_descriptions():
     # Sample test data based on location_descriptions.csv
@@ -320,7 +377,7 @@ def test_process_location_descriptions():
             "ecology": "NULL",
             "species": "NULL",
             "notes": "Location refined based on notes from Doug Smith.\n",
-            "refs": "NULL"
+            "refs": "NULL",
         },
         {
             "id": "2",
@@ -330,8 +387,8 @@ def test_process_location_descriptions():
             "gen_desc": "NULL",
             "ecology": "NULL",
             "species": "NULL",
-            "notes": "This is a gated community called \"Buttonwood Bay Condominiums\" at milepost 96...",
-            "refs": "NULL"
+            "notes": 'This is a gated community called "Buttonwood Bay Condominiums" at milepost 96...',
+            "refs": "NULL",
         },
         {
             "id": "3",
@@ -342,8 +399,8 @@ def test_process_location_descriptions():
             "ecology": "The bay side is hammock blending rapidly into coastal buttonwood scrub...",
             "species": "Airplants (_Tillandsia_ spp.) and lichens...",
             "notes": "Rockland / dwarf mangrove forest near the old dump:",
-            "refs": ""
-        }
+            "refs": "",
+        },
     ]
 
     result = process_location_descriptions(test_data)
@@ -387,8 +444,17 @@ def test_process_location_descriptions():
             assert isinstance(loc_data[field], (str, type(None)))
 
     # Test that all required fields are present
-    required_fields = {"_id", "location_id", "source_type", "source_name",
-                      "gen_desc", "ecology", "species", "notes", "refs"}
+    required_fields = {
+        "_id",
+        "location_id",
+        "source_type",
+        "source_name",
+        "gen_desc",
+        "ecology",
+        "species",
+        "notes",
+        "refs",
+    }
     for loc_data in result.values():
         assert all(field in loc_data for field in required_fields)
 
@@ -397,6 +463,7 @@ def test_process_location_descriptions():
 
     # Test that all locations from input are processed
     assert len(result) == len(test_data)
+
 
 def test_process_locations():
     # Sample test data based on locations.csv
@@ -409,7 +476,7 @@ def test_process_locations():
             "east": "-123.7379989624",
             "west": "-123.7779998779",
             "high": "100",
-            "low": "0"
+            "low": "0",
         },
         {
             "id": "2",
@@ -419,7 +486,7 @@ def test_process_locations():
             "east": "-118.2801055908",
             "west": "-118.3703155518",
             "high": "294",
-            "low": "148"
+            "low": "148",
         },
         {
             "id": "3",
@@ -429,8 +496,8 @@ def test_process_locations():
             "east": "-120.6139984131",
             "west": "-120.6200027466",
             "high": "NULL",
-            "low": "NULL"
-        }
+            "low": "NULL",
+        },
     ]
 
     result = process_locations(test_data)
@@ -452,13 +519,17 @@ def test_process_locations():
     # Test location with NULL values
     loc3 = result[3]
     assert loc3["_id"] == 3
-    assert loc3["name"] == "Mitrula Marsh, Tahoe National Forest, Sierra Co., California, USA"
+    assert (
+        loc3["name"]
+        == "Mitrula Marsh, Tahoe National Forest, Sierra Co., California, USA"
+    )
     assert loc3["north"] == 39.6272010803
     assert loc3["south"] == 39.6226005554
     assert loc3["east"] == -120.6139984131
     assert loc3["west"] == -120.6200027466
     assert loc3["high"] is None
     assert loc3["low"] is None
+
 
 def test_process_name_classifications():
     # Sample test data based on name_classifications.csv
@@ -470,7 +541,7 @@ def test_process_name_classifications():
             "phylum": "",
             "class": "",
             "order": "",
-            "family": ""
+            "family": "",
         },
         {
             "name_id": "2",
@@ -479,7 +550,7 @@ def test_process_name_classifications():
             "phylum": "Ascomycota",
             "class": "Sordariomycetes",
             "order": "Xylariales",
-            "family": "Xylariaceae"
+            "family": "Xylariaceae",
         },
         {
             "name_id": "12",
@@ -488,7 +559,7 @@ def test_process_name_classifications():
             "phylum": "Ascomycota",
             "class": "Ascomycetes",
             "order": "Pezizales",
-            "family": "Morchellaceae"
+            "family": "Morchellaceae",
         },
         {
             "name_id": "13",
@@ -497,7 +568,7 @@ def test_process_name_classifications():
             "phylum": "",
             "class": "",
             "order": "",
-            "family": ""
+            "family": "",
         },
         {
             "name_id": "14",
@@ -506,8 +577,8 @@ def test_process_name_classifications():
             "phylum": "Basidiomycota",
             "class": "Agaricomycetes",
             "order": "",
-            "family": ""
-        }
+            "family": "",
+        },
     ]
 
     result = process_name_classifications(test_data)
@@ -563,7 +634,9 @@ def test_process_name_classifications():
     for class_data in result.values():
         # Test that if a rank is present, all higher ranks should be present
         if class_data["family"]:
-            assert all(class_data[rank] for rank in ["order", "class", "phylum", "kingdom"])
+            assert all(
+                class_data[rank] for rank in ["order", "class", "phylum", "kingdom"]
+            )
         if class_data["order"]:
             assert all(class_data[rank] for rank in ["class", "phylum", "kingdom"])
         if class_data["class"]:
@@ -572,8 +645,7 @@ def test_process_name_classifications():
             assert class_data["kingdom"]
 
     # Test that all required fields are present
-    required_fields = {"_id", "domain", "kingdom", "phylum",
-                      "class", "order", "family"}
+    required_fields = {"_id", "domain", "kingdom", "phylum", "class", "order", "family"}
     for class_data in result.values():
         assert all(field in class_data for field in required_fields)
 
@@ -582,6 +654,7 @@ def test_process_name_classifications():
 
     # Test that all classifications from input are processed
     assert len(result) == len(test_data)
+
 
 def test_process_name_descriptions():
     # Sample test data based on name_descriptions.csv
@@ -597,8 +670,8 @@ def test_process_name_descriptions():
             "habitat": "",
             "look_alikes": "",
             "uses": "",
-            "notes": "Images of Myxomycetes\n\n1. \"http://naturalhistory.uga.edu/~GMNH/Mycoherb_Site/myxogal.htm\"...",
-            "refs": ""
+            "notes": 'Images of Myxomycetes\n\n1. "http://naturalhistory.uga.edu/~GMNH/Mycoherb_Site/myxogal.htm"...',
+            "refs": "",
         },
         {
             "id": "8",
@@ -612,7 +685,7 @@ def test_process_name_descriptions():
             "look_alikes": "",
             "uses": "",
             "notes": "Current Name:\nPanellus stipticus (Bull.) P. Karst....",
-            "refs": "http://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=355858"
+            "refs": "http://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=355858",
         },
         {
             "id": "11",
@@ -626,8 +699,8 @@ def test_process_name_descriptions():
             "look_alikes": "",
             "uses": "Edible.",
             "notes": "Tylopilus chromapes (Frost) A.H. Sm. & Thiers...",
-            "refs": "http://www.indexfungorum.org/names/NamesRecord.asp?RecordID=325151"
-        }
+            "refs": "http://www.indexfungorum.org/names/NamesRecord.asp?RecordID=325151",
+        },
     ]
 
     result = process_name_descriptions(test_data)
@@ -670,8 +743,17 @@ def test_process_name_descriptions():
         assert isinstance(desc_data["source_type"], int)
 
         # Text fields should be either str or None
-        text_fields = ["source_name", "general_description", "diagnostic_description",
-                      "distribution", "habitat", "look_alikes", "uses", "notes", "refs"]
+        text_fields = [
+            "source_name",
+            "general_description",
+            "diagnostic_description",
+            "distribution",
+            "habitat",
+            "look_alikes",
+            "uses",
+            "notes",
+            "refs",
+        ]
         for field in text_fields:
             assert isinstance(desc_data[field], (str, type(None)))
 
@@ -686,9 +768,20 @@ def test_process_name_descriptions():
                 assert not desc_data[field].endswith("\n")
 
     # Test that all required fields are present
-    required_fields = {"_id", "name_id", "source_type", "source_name",
-                      "general_description", "diagnostic_description", "distribution",
-                      "habitat", "look_alikes", "uses", "notes", "refs"}
+    required_fields = {
+        "_id",
+        "name_id",
+        "source_type",
+        "source_name",
+        "general_description",
+        "diagnostic_description",
+        "distribution",
+        "habitat",
+        "look_alikes",
+        "uses",
+        "notes",
+        "refs",
+    }
     for desc_data in result.values():
         assert all(field in desc_data for field in required_fields)
 
@@ -697,6 +790,7 @@ def test_process_name_descriptions():
 
     # Test that all descriptions from input are processed
     assert len(result) == len(test_data)
+
 
 def test_process_names():
     # Sample test data based on names.csv
@@ -708,7 +802,7 @@ def test_process_names():
             "deprecated": "0",
             "correct_spelling_id": "NULL",
             "synonym_id": "9996",
-            "rank": "14"
+            "rank": "14",
         },
         {
             "id": "2",
@@ -717,7 +811,7 @@ def test_process_names():
             "deprecated": "0",
             "correct_spelling_id": "NULL",
             "synonym_id": "8975",
-            "rank": "16"
+            "rank": "16",
         },
         {
             "id": "16",
@@ -726,7 +820,7 @@ def test_process_names():
             "deprecated": "0",
             "correct_spelling_id": "NULL",
             "synonym_id": "2663",
-            "rank": "4"
+            "rank": "4",
         },
         {
             "id": "23",
@@ -735,8 +829,8 @@ def test_process_names():
             "deprecated": "1",
             "correct_spelling_id": "NULL",
             "synonym_id": "682",
-            "rank": "4"
-        }
+            "rank": "4",
+        },
     ]
 
     result = process_names(test_data)
@@ -795,8 +889,15 @@ def test_process_names():
         assert name_data["author"].strip() == name_data["author"]
 
     # Test that all required fields are present
-    required_fields = {"_id", "text_name", "author", "deprecated",
-                      "correct_spelling_id", "synonym_id", "rank"}
+    required_fields = {
+        "_id",
+        "text_name",
+        "author",
+        "deprecated",
+        "correct_spelling_id",
+        "synonym_id",
+        "rank",
+    }
     for name_data in result.values():
         assert all(field in name_data for field in required_fields)
 
@@ -805,6 +906,7 @@ def test_process_names():
 
     # Test that all names from input are processed
     assert len(result) == len(test_data)
+
 
 def test_process_observations():
     # Sample test data based on observations.csv
@@ -819,7 +921,7 @@ def test_process_observations():
             "alt": "NULL",
             "vote_cache": "1.92335",
             "is_collection_location": "1",
-            "thumb_image_id": "1"
+            "thumb_image_id": "1",
         },
         {
             "id": "15",
@@ -831,7 +933,7 @@ def test_process_observations():
             "alt": "NULL",
             "vote_cache": "NULL",
             "is_collection_location": "1",
-            "thumb_image_id": "18"
+            "thumb_image_id": "18",
         },
         {
             "id": "35",
@@ -843,8 +945,8 @@ def test_process_observations():
             "alt": "NULL",
             "vote_cache": "NULL",
             "is_collection_location": "0",
-            "thumb_image_id": "42"
-        }
+            "thumb_image_id": "42",
+        },
     ]
 
     result = process_observations(test_data)
@@ -879,4 +981,3 @@ def test_process_observations():
     assert obs35["vote_cache"] is None
 
     # Test data
-
