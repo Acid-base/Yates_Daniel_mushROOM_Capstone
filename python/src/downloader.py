@@ -8,9 +8,9 @@ from typing import Optional, Dict
 import time
 from datetime import datetime
 
-from config import DataConfig, MODataSource
-from exceptions import FileProcessingError
-from monitoring import measure_performance
+from src.config import DataConfig, MODataSource
+from src.exceptions import FileProcessingError
+from src.monitoring import measure_performance
 
 logger = logging.getLogger(__name__)
 

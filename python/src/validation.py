@@ -152,3 +152,11 @@ def validate_with_schema(
         errors=all_errors,
         warnings=all_warnings
     ) 
+
+def validate_data(data: Dict[str, Any], schema: Dict[str, type]) -> bool:
+    """Validate data against schema."""
+    try:
+        result = validate_with_schema(data, schema)
+        return result.is_valid
+    except Exception as e:
+        return False 

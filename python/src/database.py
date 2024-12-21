@@ -7,9 +7,9 @@ from dataclasses import asdict
 import asyncio
 import logging
 
-from exceptions import DatabaseError
-from monitoring import measure_performance
-from config import DataConfig
+from src.exceptions import DatabaseError
+from src.monitoring import measure_performance
+from src.config import DataConfig
 
 logger = logging.getLogger(__name__)
 

@@ -6,29 +6,29 @@ import asyncio
 import logging
 import logging.config
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, AsyncGenerator
 
 import pandas as pd
 from dotenv import load_dotenv
 
-from config import DataConfig, load_yaml_config
-from database import get_database
-from downloader import download_mo_data
-from exceptions import (
+from src.config import DataConfig, load_yaml_config
+from src.database import get_database
+from src.downloader import download_mo_data
+from src.exceptions import (
     DataProcessingError,
     ValidationError,
     DatabaseError,
     FileProcessingError
 )
-from monitoring import measure_performance
-from validation import (
+from src.monitoring import measure_performance
+from src.validation import (
     SchemaValidator,
     DateValidator,
     LocationValidator,
     NameValidator,
     validate_with_schema
 )
-from schemas import SCHEMAS
+from src.schemas import SCHEMAS
 
 # Initialize logging
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class DataProcessor:
         self,
         file_path: Path,
         schema_name: str
-    ) -> List[Dict[str, Any]]:
+    ) -> AsyncGenerator[List[Dict[str, Any]], None]:
         """Process a single data file."""
         try:
             schema = SCHEMAS.get(schema_name)
@@ -58,21 +58,19 @@ class DataProcessor:
             
             # Read CSV file with proper encoding and error handling
             df = pd.read_csv(
-                
-                
                 file_path,
-                delimiter=self.config.DEFAULT_DELIMITER,
-                na_values=list(self.config.NULL_VALUES),
+                delimiter=self.config.default_delimiter,
+                na_values=list(self.config.null_values),
                 encoding='utf-8',
                 on_bad_lines='warn'
             )
             
             # Process data in chunks to manage memory
-            chunk_size = 1000
-            processed_data = []
+            chunk_size = self.config.batch_size
             
             for i in range(0, len(df), chunk_size):
                 chunk = df.iloc[i:i + chunk_size]
+                processed_data = []
                 
                 for _, row in chunk.iterrows():
                     data = row.to_dict()
@@ -94,11 +92,14 @@ class DataProcessor:
                     
                     processed_data.append(self._process_record(data, schema_name))
                 
-                logger.info(
-                    f"Processed {len(processed_data)} records from {schema_name}"
-                )
-            
-            return processed_data
+                if processed_data:
+                    logger.info(
+                        f"Processed {len(processed_data)} records from {schema_name}"
+                    )
+                    yield processed_data
+                
+                # Give other tasks a chance to run
+                await asyncio.sleep(0)
             
         except Exception as e:
             raise FileProcessingError(f"Failed to process {file_path}: {e}")
@@ -143,7 +144,7 @@ class DataProcessor:
             "location": {
                 "lat": float(data["lat"]) if pd.notna(data["lat"]) else None,
                 "lng": float(data["lng"]) if pd.notna(data["lng"]) else None,
-                "alt": float(data[" alt"]) if pd.notna(data[" alt"]) else None
+                "alt": float(data["alt"]) if pd.notna(data["alt"]) else None
             },
             "vote_cache": float(data["vote_cache"]) if pd.notna(data["vote_cache"]) else None,
             "is_collection_location": bool(data["is_collection_location"]),
@@ -170,8 +171,8 @@ class DataProcessor:
             "source_type": int(data["source_type"]) if pd.notna(data["source_type"]) else None,
             "source_name": str(data["source_name"]).strip() if pd.notna(data["source_name"]) else None,
             "description": {
-                "general": str(data["general_description"]).strip() if pd.notna(data["general_description"]) else None,
-                "diagnostic": str(data["diagnostic_description"]).strip() if pd.notna(data["diagnostic_description"]) else None,
+                "general": str(data["gen_desc"]).strip() if pd.notna(data["gen_desc"]) else None,
+                "diagnostic": str(data["diag_desc"]).strip() if pd.notna(data["diag_desc"]) else None,
                 "distribution": str(data["distribution"]).strip() if pd.notna(data["distribution"]) else None,
                 "habitat": str(data["habitat"]).strip() if pd.notna(data["habitat"]) else None,
                 "look_alikes": str(data["look_alikes"]).strip() if pd.notna(data["look_alikes"]) else None,
@@ -265,9 +266,7 @@ async def main() -> None:
             # Process each data file
             for schema_name, file_path in data_files.items():
                 logger.info(f"Processing {schema_name} data")
-                processed_data = await processor.process_file(file_path, schema_name)
-                
-                if processed_data:
+                async for processed_data in processor.process_file(file_path, schema_name):
                     collection = db.get_collection(schema_name)
                     await db.batch_upsert(collection, processed_data)
                     logger.info(f"Successfully processed {len(processed_data)} {schema_name} records")
