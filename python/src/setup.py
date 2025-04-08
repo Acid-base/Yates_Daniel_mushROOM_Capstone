@@ -29,7 +29,19 @@ root:
     handlers: [console, file]
 """,
     ".env": """
-MONGODB_URI="mongodb+srv://danieljoyates:tcwxddksxyrnkfbb@cluster0.ek85w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# MongoDB connection URI (replace with your actual URI)
+MONGODB_URI=your_mongodb_uri_here
+# Database name
+DATABASE_NAME=mushroom_db
+# Processing settings
+BATCH_SIZE=1000
+DEFAULT_DELIMITER=\t
+# Comma-separated list of values to treat as NULL
+NULL_VALUES=NULL,NA,None,""
+DATE_FORMAT=%Y-%m-%d
+MAX_RETRIES=3
+RETRY_DELAY=5
+CHUNK_SIZE=8192
 """,
 }
 

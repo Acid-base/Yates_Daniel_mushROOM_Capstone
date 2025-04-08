@@ -1,163 +1,97 @@
-"""Configuration management using Pydantic."""
+"""Configuration management module."""
 
+import os
+import re
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
-from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
-import yaml
-from src.exceptions import ConfigurationError
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field, validator
 
 
-class MODataSource:
-    """Mushroom Observer data source URLs."""
+def resolve_env_placeholders(value: Any) -> Any:
+    """
+    Resolve environment variable placeholders in a string value.
+    E.g., ${MY_VAR} or $MY_VAR will be replaced with the value of MY_VAR environment variable.
+    """
+    if not isinstance(value, str):
+        return value
 
-    BASE_URL = "https://mushroomobserver.org"
+    # Pattern matches both ${VAR} and $VAR formats
+    pattern = r"\$\{([^}]+)\}|\$([A-Za-z_][A-Za-z0-9_]*)"
 
-    def __init__(self):
-        """
-        Initialize the MODataSource class with URLs for various data sources.
+    def replace_var(match):
+        var_name = match.group(1) or match.group(2)
+        return os.getenv(var_name, match.group(0))
 
-        This method sets up the URLs for different datasets available from the Mushroom Observer website.
-        Each URL corresponds to a specific CSV file containing relevant data.
-
-        - Core Data:
-            - OBSERVATIONS: URL for the observations dataset.
-            - NAMES: URL for the names dataset.
-            - LOCATIONS: URL for the locations dataset.
-            - IMAGES: URL for the images dataset.
-        - Relationships:
-            - IMAGES_OBSERVATIONS: URL for the dataset linking images to observations.
-
-        - Taxonomic Data:
-            - NAME_CLASSIFICATIONS: URL for the dataset containing taxonomic classifications of names.
-            - NAME_DESCRIPTIONS: URL for the dataset containing descriptions of names.
-        - Location Data:
-            - LOCATION_DESCRIPTIONS: URL for the dataset containing descriptions of locations.
-        """
-        self.OBSERVATIONS = f"{self.BASE_URL}/observations.csv"
-        self.NAMES = f"{self.BASE_URL}/names.csv"
-        self.LOCATIONS = f"{self.BASE_URL}/locations.csv"
-        self.IMAGES = f"{self.BASE_URL}/images.csv"
-
-        # Relationships
-        self.IMAGES_OBSERVATIONS = f"{self.BASE_URL}/images_observations.csv"
-
-        # Taxonomic data
-        self.NAME_CLASSIFICATIONS = f"{self.BASE_URL}/name_classifications.csv"
-        self.NAME_DESCRIPTIONS = f"{self.BASE_URL}/name_descriptions.csv"
-
-        # Location data
-        self.LOCATION_DESCRIPTIONS = f"{self.BASE_URL}/location_descriptions.csv"
+    return re.sub(pattern, replace_var, value)
 
 
-class DataConfig(BaseSettings):
-    """Main configuration settings."""
+def process_config_dict(config_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Process a config dictionary, resolving environment variable placeholders recursively.
+    """
+    processed = {}
+    for key, value in config_dict.items():
+        if isinstance(value, dict):
+            processed[key] = process_config_dict(value)
+        elif isinstance(value, list):
+            processed[key] = [resolve_env_placeholders(item) for item in value]
+        else:
+            processed[key] = resolve_env_placeholders(value)
+    return processed
 
-    # Database settings
-    MONGODB_URI: str = Field(
-        ..., env="MONGODB_URI", description="MongoDB connection string"
+
+class DataConfig(BaseModel):
+    """Data processing configuration."""
+
+    DATA_DIR: str = Field(
+        default_factory=lambda: os.path.abspath(
+            os.getenv("DATA_DIR", str(Path("data").absolute()))
+        )
     )
-    DATABASE_NAME: str = Field("mushroom_db")
     BATCH_SIZE: int = Field(
-        1000, ge=1, description="Batch size for database operations"
+        default_factory=lambda: int(os.getenv("BATCH_SIZE", "1000"))
     )
-
-    # File settings
-    DEFAULT_DELIMITER: str = Field("\t", description="Default delimiter for CSV files")
-    NULL_VALUES: Tuple[str, ...] = Field(
-        ("NULL",), description="Values to be treated as null"
-    )
-    DATE_FORMAT: str = Field("%Y-%m-%d", description="Date format for parsing dates")
-    LOG_CONFIG_PATH: Path = Field(
-        Path("logging.yaml"), description="Path to the logging configuration file"
-    )
-    DATA_DIR: Path = Field(Path("data"), description="Path to the data directory")
-
-    # Processing settings
-    MAX_RETRIES: int = Field(
-        3, description="Maximum number of retries for failed operations"
-    )
-    RETRY_DELAY: int = Field(
-        5, description="Delay in seconds before retrying an operation"
-    )  # seconds
+    MAX_RETRIES: int = Field(default_factory=lambda: int(os.getenv("MAX_RETRIES", "3")))
+    RETRY_DELAY: int = Field(default_factory=lambda: int(os.getenv("RETRY_DELAY", "5")))
     CHUNK_SIZE: int = Field(
-        8192, description="Chunk size in bytes for file downloads"
-    )  # bytes for file download
-
-    # MongoDB indexes
-    INDEXES: Dict[str, List[Dict[str, Any]]] = Field(
-        default_factory=lambda: {
-            "observations": [
-                {"keys": [("name_id", 1)]},
-                {"keys": [("location_id", 1)]},
-                {"keys": [("user_id", 1)]},
-                {"keys": [("when", 1)]},
-                {"keys": [("lat", 1), ("lng", 1)]},
-            ],
-            "names": [
-                {"keys": [("text_name", 1)], "unique": True},
-                {"keys": [("synonym_id", 1)]},
-                {"keys": [("rank", 1)]},
-            ],
-            "images_observations": [
-                {"keys": [("observation_id", 1)]},
-                {"keys": [("image_id", 1)]},
-            ],
-            "locations": [
-                {"keys": [("name", 1)]},
-                {"keys": [("north", 1), ("south", 1), ("east", 1), ("west", 1)]},
-            ],
-            "images": [
-                {"keys": [("content_type", 1)]},
-                {"keys": [("created_at", 1)]},
-            ],
-            "name_classifications": [
-                {"keys": [("name_id", 1)]},
-                {
-                    "keys": [
-                        ("kingdom", 1),
-                        ("phylum", 1),
-                        ("class", 1),
-                        ("order", 1),
-                        ("family", 1),
-                    ]
-                },
-            ],
-            "name_descriptions": [
-                {"keys": [("name_id", 1)]},
-                {"keys": [("source_type", 1)]},
-            ],
-            "location_descriptions": [
-                {"keys": [("location_id", 1)]},
-                {"keys": [("source_type", 1)]},
-            ],
-        },
-        description="MongoDB indexes for collections",
+        default_factory=lambda: int(os.getenv("CHUNK_SIZE", "8192"))
+    )
+    NULL_VALUES: List[str] = Field(
+        default_factory=lambda: os.getenv("NULL_VALUES", "").split(",")
+        or ["", "NULL", "null", "NA", "N/A", "n/a", "None", "none"]
+    )
+    MONGODB_URI: Optional[str] = Field(default_factory=lambda: os.getenv("MONGODB_URI"))
+    DATABASE_NAME: Optional[str] = Field(
+        default_factory=lambda: os.getenv("DATABASE_NAME", "mushroom_db")
     )
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="allow",  # Allow extra fields in MongoDB URI
-    )
-
-    @field_validator("BATCH_SIZE")
-    def validate_batch_size(cls, v: int) -> int:
-        if v <= 0:
-            raise ValueError("Batch size must be positive")
-        return v
-
-    @field_validator("DATA_DIR")
-    def validate_data_dir(cls, v: Path) -> Path:
-        v.mkdir(parents=True, exist_ok=True)
-        return v
+    @validator("DATA_DIR")
+    def validate_data_dir(cls, v):
+        """Validate and create data directory if it doesn't exist."""
+        path = Path(v)
+        path.mkdir(parents=True, exist_ok=True)
+        return str(path.absolute())
 
 
-def load_yaml_config(path: Path) -> Dict[str, Any]:
-    """Load YAML configuration file."""
+def load_config(config_path: Optional[Path] = None) -> DataConfig:
+    """Load configuration from environment variables with defaults.
+
+    Args:
+        config_path: Optional path to a YAML config file to load settings from
+
+    Returns:
+        DataConfig: Configuration object with loaded settings
+
+    Raises:
+        ValueError: If there is an error loading the configuration
+    """
     try:
-        with open(path) as f:
-            return yaml.safe_load(f)
+        config = DataConfig()
+        # Convert to dict for processing
+        config_dict = config.model_dump()
+        # Process the dictionary
+        processed_dict = process_config_dict(config_dict)
+        # Create new config from processed dict
+        return DataConfig(**processed_dict)
     except Exception as e:
-        raise ConfigurationError(f"Failed to load config from {path}: {e}")
+        raise ValueError(f"Error loading configuration: {e}")

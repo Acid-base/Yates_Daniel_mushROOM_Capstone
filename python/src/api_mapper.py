@@ -18,7 +18,7 @@ class MOApiMapper:
     """Maps and tests Mushroom Observer API endpoints."""
 
     BASE_URL = "https://mushroomobserver.org/api2"
-    REQUEST_DELAY = 20  # seconds between requests
+    REQUEST_DELAY = 12  # seconds between requests
 
     def __init__(self, config: DataConfig, output_dir: Path):
         self.config = config
