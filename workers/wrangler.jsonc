@@ -1,0 +1,22 @@
+{
+  "name": "mushroom-image-processor",
+  "compatibility_date": "2025-04-03",
+  "main": "./src/index.ts",
+  "r2_buckets": [
+    {
+      "binding": "MUSHROOM_IMAGES",
+      "bucket_name": "mushroom",
+      "preview_bucket_name": "mushroom-dev"
+    }
+  ],
+  "triggers": {
+    "crons": ["0 0 * * *"]
+  },
+  "vars": {
+    "MONGODB_CONNECTION_STRING": "",
+    "DB_NAME": "mushroom_field_guide",
+    "COLLECTION_NAME": "species",
+    "RATE_LIMIT_REQUESTS_PER_MINUTE": "20",
+    "RATE_LIMIT_MIN_INTERVAL_MS": "5000"
+  }
+}
