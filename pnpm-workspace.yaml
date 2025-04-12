@@ -1,5 +1,5 @@
 packages:
-  - frontend
-  - backend
-onlyBuiltDependencies:
-  - esbuild
+  - 'frontend'
+  - 'backend'
+  - 'workers'
+  - 'workers/*'
