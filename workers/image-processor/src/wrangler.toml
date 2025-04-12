@@ -1,0 +1,29 @@
+name = "mushroom-image-processor"
+main = "./workers/image-processor/src/index.ts"
+compatibility_date = "2023-06-01"
+
+# Specify the Workers environment
+workers_dev = true
+
+# Define R2 bucket binding
+[[r2_buckets]]
+binding = "MUSHROOM_IMAGES"
+bucket_name = "mushroom-images"
+
+# Define your environment variables
+[vars]
+DB_NAME = "mushroom_db"
+COLLECTION_NAME = "mushrooms"
+RATE_LIMIT_REQUESTS_PER_MINUTE = "12"
+RATE_LIMIT_MIN_INTERVAL_MS = "5000"
+
+# Cron triggers for scheduled execution
+[triggers]
+crons = ["*/30 * * * *"] # Run every 30 minutes
+
+# Environment-specific configurations
+[env.production]
+# Production-specific variables go here
+
+[env.staging]
+# Staging-specific variables go here
