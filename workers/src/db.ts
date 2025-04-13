@@ -1,7 +1,11 @@
 /**
  * MongoDB connection module for the Cloudflare Worker
  */
+import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
+
+// Load environment variables - in Workers environment we rely on vars from wrangler.jsonc
+dotenv.config();
 
 // Cache the client connection to reuse across requests
 let cachedClient: MongoClient | null = null;
@@ -18,7 +22,7 @@ export async function connect(connectionString: string) {
   if (cachedClient) {
     return {
       client: cachedClient,
-      db: cachedClient.db(process.env.DB_NAME || 'mushroom_field_guide')
+      db: cachedClient.db(process.env.DB_NAME || 'mushroom_field_guide'),
     };
   }
 
@@ -32,6 +36,6 @@ export async function connect(connectionString: string) {
 
   return {
     client,
-    db: client.db(process.env.DB_NAME || 'mushroom_field_guide')
+    db: client.db(process.env.DB_NAME || 'mushroom_field_guide'),
   };
 }

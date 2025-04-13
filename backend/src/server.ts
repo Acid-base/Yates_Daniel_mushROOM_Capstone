@@ -59,7 +59,7 @@ let db: Db;
 let mushroomCollection: Collection<any>; // Use a more specific type if available
 
 MongoClient.connect(MONGODB_CONNECTION_STRING)
-  .then((client) => {
+  .then((client: MongoClient) => {
     console.log('Connected successfully to MongoDB');
     db = client.db(DB_NAME);
     mushroomCollection = db.collection(COLLECTION_NAME);
@@ -68,7 +68,7 @@ MongoClient.connect(MONGODB_CONNECTION_STRING)
       console.log(`Server running on port ${PORT}`);
     });
   })
-  .catch((err) => {
+  .catch((err: Error) => {
     console.error('Failed to connect to MongoDB', err);
     process.exit(1);
   });

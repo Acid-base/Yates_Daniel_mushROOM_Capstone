@@ -66,6 +66,9 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
+      '@types/node':
+        specifier: ^20.11.30
+        version: 20.17.30
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.17.30)(typescript@5.8.3)
@@ -146,6 +149,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20250410.0
         version: 4.20250410.0
+      wrangler:
+        specifier: ^4.10.0
+        version: 4.10.0(@cloudflare/workers-types@4.20250410.0)
 
 packages:
 

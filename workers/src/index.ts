@@ -7,13 +7,11 @@
  * 3. Updating MongoDB records with new image URLs
  */
 
-import { connect } from './db';
+import { ExecutionContext, ScheduledEvent } from '@cloudflare/workers-types';
 import dotenv from 'dotenv';
+import { connect } from './db';
 dotenv.config();
-import { ScheduledEvent, ExecutionContext } from '@cloudflare/workers-types';
 const R2BUCKET = 'Mushroom';
-const apitoken
-
 
 // Types for our environment bindings
 interface Env {
@@ -26,19 +24,26 @@ interface Env {
   COLLECTION_NAME: string;
   RATE_LIMIT_REQUESTS_PER_MINUTE: string;
   RATE_LIMIT_MIN_INTERVAL_MS: string;
+
+  // R2 Configuration
+  R2_ENDPOINT: string;
+  R2_ACCESS_KEY_ID: string;
+  R2_SECRET_ACCESS_KEY: string;
+  R2_BUCKET_NAME: string;
+  R2_PUBLIC_URL: string;
 }
 
 // CRON triggered handler
 export default {
   // This is the main entry point for scheduled execution
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    console.log("Starting scheduled mushroom image processing job");
+    console.log('Starting scheduled mushroom image processing job');
 
     try {
       await processMushroomImages(env);
-      console.log("Scheduled image processing completed successfully");
+      console.log('Scheduled image processing completed successfully');
     } catch (error) {
-      console.error("Error during scheduled image processing:", error);
+      console.error('Error during scheduled image processing:', error);
     }
   },
 
@@ -47,39 +52,45 @@ export default {
     const url = new URL(request.url);
 
     // Simple status endpoint
-    if (url.pathname === "/status") {
-      return new Response(JSON.stringify({
-        status: "ok",
-        worker: "mushroom-image-processor",
-        timestamp: new Date().toISOString()
-      }), {
-        headers: {
-          "Content-Type": "application/json"
+    if (url.pathname === '/status') {
+      return new Response(
+        JSON.stringify({
+          status: 'ok',
+          worker: 'mushroom-image-processor',
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     }
 
     // Manual trigger endpoint (protected with a simple auth check)
-    if (url.pathname === "/process" && request.method === "POST") {
+    if (url.pathname === '/process' && request.method === 'POST') {
       // In production, add proper authentication here
 
       // Process in the background so the request can return quickly
       ctx.waitUntil(processMushroomImages(env));
 
-      return new Response(JSON.stringify({
-        status: "processing",
-        message: "Image processing job started in the background",
-        timestamp: new Date().toISOString()
-      }), {
-        headers: {
-          "Content-Type": "application/json"
+      return new Response(
+        JSON.stringify({
+          status: 'processing',
+          message: 'Image processing job started in the background',
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     }
 
     // Default response for other paths
-    return new Response("Not found", { status: 404 });
-  }
+    return new Response('Not found', { status: 404 });
+  },
 };
 
 /**
@@ -100,14 +111,13 @@ async function processMushroomImages(env: Env): Promise<void> {
     // Process in batches
     while (hasMoreImages) {
       // Find mushrooms with unprocessed images
-      const mushrooms = await collection.find({
-        'image.url': { $exists: true },
-        'image.url': { $ne: null },
-        $or: [
-          { 'image.source': { $ne: 'r2' } },
-          { 'image.source': { $exists: false } }
-        ]
-      }).limit(batchSize).toArray();
+      const mushrooms = await collection
+        .find({
+          'image.url': { $exists: true, $ne: null },
+          $or: [{ 'image.source': { $ne: 'r2' } }, { 'image.source': { $exists: false } }],
+        })
+        .limit(batchSize)
+        .toArray();
 
       // Exit loop if no more mushrooms to process
       if (mushrooms.length === 0) {
@@ -126,7 +136,7 @@ async function processMushroomImages(env: Env): Promise<void> {
 
         if (waitTime > 0) {
           console.log(`Rate limiting: waiting ${waitTime}ms before next request`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
         }
 
         try {
@@ -141,7 +151,7 @@ async function processMushroomImages(env: Env): Promise<void> {
       }
 
       // Small delay between batches
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     console.log(`Image processing completed. Total processed: ${processedCount}`);
@@ -172,8 +182,8 @@ async function processMushroomImage(mushroom: any, collection: any, env: Env): P
     const response = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'mushROOM Field Guide/1.0 (educational project)',
-        'Accept': 'image/jpeg,image/png,image/*'
-      }
+        Accept: 'image/jpeg,image/png,image/*',
+      },
     });
 
     if (!response.ok) {
@@ -190,12 +200,20 @@ async function processMushroomImage(mushroom: any, collection: any, env: Env): P
     // Upload to R2
     await env.MUSHROOM_IMAGES.put(fileName, imageData, {
       httpMetadata: {
-        contentType: `image/${fileExtension === 'png' ? 'png' : 'jpeg'}`
-      }
+        contentType: `image/${fileExtension === 'png' ? 'png' : 'jpeg'}`,
+      },
     });
 
-    // Get the R2 public URL
-    const r2PublicUrl = `https://mushroom-images.${env.MUSHROOM_IMAGES.name}.r2.dev/${fileName}`;
+    // Get the R2 public URL - ensure we don't duplicate the bucket name
+    // The bucket name is already in the R2_PUBLIC_URL, so just add the file path
+    const bucketName = env.R2_BUCKET_NAME || 'mushroom';
+    // Check if R2_PUBLIC_URL already ends with the bucket name
+    const baseUrl = env.R2_PUBLIC_URL.endsWith(`/${bucketName}`)
+      ? env.R2_PUBLIC_URL
+      : `${env.R2_PUBLIC_URL}/${bucketName}`;
+    const r2PublicUrl = `${baseUrl}/${fileName}`;
+
+    console.log(`Generated R2 URL: ${r2PublicUrl}`);
 
     // Update MongoDB
     await collection.updateOne(
@@ -205,15 +223,14 @@ async function processMushroomImage(mushroom: any, collection: any, env: Env): P
           'image.url': r2PublicUrl,
           'image.source': 'r2',
           'image.processed_at': new Date(),
-          'image.original_url': imageUrl
-        }
+          'image.original_url': imageUrl,
+        },
       }
     );
 
     // Calculate request time for rate limiting
     const requestTime = Date.now() - startTime;
     console.log(`Processed image for ${mushroom.scientific_name} in ${requestTime}ms`);
-
   } catch (error) {
     console.error(`Error processing image for ${mushroom.scientific_name}:`, error);
     throw error;
