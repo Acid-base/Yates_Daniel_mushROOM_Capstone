@@ -23,12 +23,12 @@ export function useMushrooms(filter: MushroomFilter = {}, page = 0, limit = 10) 
   });
 
   return {
-    mushrooms: mushroomsQuery.data || [],
+    mushrooms: mushroomsQuery.data?.data || [],
     isLoading: mushroomsQuery.isLoading,
     isError: mushroomsQuery.isError,
     error: mushroomsQuery.error,
-    totalCount: countQuery.data || 0,
-    totalPages: countQuery.data ? Math.ceil(countQuery.data / limit) : 0,
+    totalCount: countQuery.data?.count || 0,
+    totalPages: countQuery.data?.count ? Math.ceil(countQuery.data.count / limit) : 0,
     isFetching: mushroomsQuery.isFetching || countQuery.isFetching,
   };
 }

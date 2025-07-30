@@ -16,13 +16,13 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { FilterSidebar } from './components/FilterSidebar';
+import Header from './components/Header.tsx';
 import MushroomCard from './components/MushroomCard';
 import MushroomDetails from './components/MushroomDetails';
 import { useMushrooms } from './hooks/useMushrooms';
 import { queryClient } from './queryClient';
 import theme from './theme';
 import { Mushroom, MushroomFilter } from './types/mushroom';
-import Header from './components/Header.tsx';
 
 function App() {
   const [selectedMushroom, setSelectedMushroom] = useState<Mushroom | null>(null);
@@ -31,7 +31,7 @@ function App() {
   const itemsPerPage = 12;
 
   const {
-    mushrooms,
+    mushrooms = [],
     isLoading,
     isError,
     error,
@@ -114,7 +114,7 @@ function App() {
                   ) : (
                     <>
                       <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={6}>
-                        {mushrooms.map((mushroom) => (
+                        {Array.isArray(mushrooms) && mushrooms.map((mushroom) => (
                           <MushroomCard
                             key={mushroom._id}
                             mushroom={mushroom}
